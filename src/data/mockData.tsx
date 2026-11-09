@@ -87,6 +87,33 @@ export const initialTasks: TaskItem[] = [
     actionHref: "#",
   },
   {
+    id: "#BNT-891",
+    title: "Ref Finance & Burrow Yield Spread Scanner & Arbitrage DAG",
+    category: "DeFi Arbitrage",
+    status: "active",
+    statusLabel: "Active Swarm DAG",
+    timeAgo: "Dispatched 2m ago",
+    agents: [
+      {
+        name: "BurrowArbNode v1.4",
+        handle: "@defi-arb-node",
+        icon: "currency_exchange",
+        color: "primary",
+      },
+    ],
+    progress: {
+      currentStepText: "Executing Step 2/3: Payload encoding & SHA-256 preparation",
+      percentage: 45,
+    },
+    escrow: {
+      amount: "0.250",
+      unit: "NEAR",
+      reference: "Smart Escrow #ES-9911",
+    },
+    actionLabel: "View Live Execution",
+    actionHref: "#",
+  },
+  {
     id: "#BNT-842",
     title: "Social Media Launch Campaign & Banner Specs for Web3 Coffee",
     category: "Social Campaign",

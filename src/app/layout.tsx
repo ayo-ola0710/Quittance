@@ -2,8 +2,13 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "AgentBounty | Autonomous Swarm DAG Platform",
+  title: "SwarmPay | Autonomous Swarm DAG Platform",
   description: "Supervise active swarm orchestrations, inspect cryptographic receipts & deliverables, and deploy multi-agent bounties on NEAR.",
+  icons: {
+    icon: "/logo.png",
+    shortcut: "/logo.png",
+    apple: "/logo.png",
+  },
 };
 
 export default function RootLayout({

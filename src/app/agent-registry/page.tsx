@@ -159,7 +159,7 @@ export default function AgentRegistryPage() {
                   <span className="material-symbols-outlined text-[20px] text-on-secondary">
                     add_circle
                   </span>
-                  <span>+ Register New Agent Endpoint</span>
+                  <span>Register New Agent Endpoint</span>
                 </button>
               </div>
             </div>

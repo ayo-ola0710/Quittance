@@ -8,7 +8,6 @@ interface DashboardHeaderProps {
   description?: string;
   managerAccount?: string;
   onRefresh?: () => void;
-  onQuickDispatch?: () => void;
 }
 
 export function DashboardHeader({
@@ -16,7 +15,6 @@ export function DashboardHeader({
   description = "Supervise active swarm orchestrations, inspect cryptographic receipts & deliverables, and deploy multi-agent bounties on NEAR.",
   managerAccount = "manager.testnet",
   onRefresh,
-  onQuickDispatch,
 }: DashboardHeaderProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
 

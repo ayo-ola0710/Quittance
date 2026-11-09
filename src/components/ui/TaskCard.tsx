@@ -5,9 +5,10 @@ import { TaskItem } from "../../types/types";
 interface TaskCardProps {
   task: TaskItem;
   onInspect?: (task: TaskItem) => void;
+  onViewLive?: (task: TaskItem) => void;
 }
 
-export function TaskCard({ task, onInspect }: TaskCardProps) {
+export function TaskCard({ task, onInspect, onViewLive }: TaskCardProps) {
   const {
     id,
     title,
@@ -286,15 +287,18 @@ export function TaskCard({ task, onInspect }: TaskCardProps) {
 
           <div className="flex items-center gap-space-xs">
             {isActive && (
-              <Link
-                href={actionHref}
-                className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-primary hover:bg-primary-container active:scale-95 text-on-primary font-body-sm font-semibold shadow-[0_0_24px_-4px_rgba(6,182,212,0.4)] transition-all duration-150"
+              <button
+                type="button"
+                onClick={() => onViewLive?.(task)}
+                className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-primary hover:bg-primary-container active:scale-95 text-on-primary font-body-sm font-semibold shadow-[0_0_24px_-4px_rgba(6,182,212,0.4)] transition-all duration-150 cursor-pointer"
               >
-                <span>{actionLabel || "View Live Execution"}</span>
-                <span className="material-symbols-outlined text-[16px]">
-                  arrow_forward
+                <span className="relative flex h-2 w-2 shrink-0">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-on-primary opacity-60" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-on-primary" />
                 </span>
-              </Link>
+                <span>{actionLabel || "View Live Execution"}</span>
+                <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+              </button>
             )}
 
             {isCompleted && (

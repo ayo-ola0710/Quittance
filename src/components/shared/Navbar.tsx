@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 
 interface NavbarProps {
@@ -18,6 +18,34 @@ export function Navbar({
 }: NavbarProps) {
   const [isConnected, setIsConnected] = useState(true);
   const [showWalletMenu, setShowWalletMenu] = useState(false);
+  const [balance, setBalance] = useState(accountBalance);
+  const [currentAccountId, setCurrentAccountId] = useState(accountId);
+  const [isLoadingBalance, setIsLoadingBalance] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+    async function fetchAccount() {
+      try {
+        setIsLoadingBalance(true);
+        const res = await fetch("/api/account");
+        if (res.ok) {
+          const data = await res.json();
+          if (isMounted) {
+            if (data.balance) setBalance(data.balance);
+            if (data.accountId) setCurrentAccountId(data.accountId);
+          }
+        }
+      } catch (err) {
+        console.warn("Failed to fetch balance", err);
+      } finally {
+        if (isMounted) setIsLoadingBalance(false);
+      }
+    }
+    fetchAccount();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const navItems = [
     { label: "Mission Control", path: "mission-control", href: "/" },
@@ -44,10 +72,10 @@ export function Navbar({
             <img
               alt="AgentBounty Swarm Logo"
               className="h-8 w-auto object-contain transition-transform group-hover:scale-105"
-              src="https://lh3.googleusercontent.com/aida/ALJJyrCB-6EDr_kDSKa4Mnk40pjNKiUQfde-sN1eTYkZnUY16gZh2CszhJegfIET-4trafYbK2YemU6ic4WrwLRM-gZh4VZq6leSJsTmCtYX8ZHFKfC6zp9NluNz52cjYJM7pNt5jynuE7y3g4J0Ac2H3GqKL1GFc6cYwd0E3eb8x-kxprCXdoWBWszirD6goIYmafUA1a-JmM5U48TzX-S7TjV5ib9C48D82Fj-Isi58eaQ"
+              src="/logo.png"
             />
             <span className="font-headline-sm tracking-tight text-on-surface font-semibold ml-2">
-              AgentBounty
+              SwarmPay
             </span>
           </Link>
           <div className="flex items-center gap-space-xs px-space-sm py-0.5 rounded-full bg-surface-container-high">
@@ -98,15 +126,15 @@ export function Navbar({
               >
                 <div className="flex items-center gap-space-xs">
                   <span className="material-symbols-outlined text-[16px] text-primary">
-                    token
+                    account_balance_wallet
                   </span>
                   <span className="font-label-mono-sm text-primary font-semibold">
-                    {accountBalance}
+                    {isLoadingBalance ? "..." : balance}
                   </span>
                 </div>
                 <span className="w-px h-3 bg-surface-container-highest" />
                 <span className="font-label-mono-sm text-on-surface">
-                  {accountId}
+                  {currentAccountId}
                 </span>
                 <span className="material-symbols-outlined text-[16px] text-on-surface-variant">
                   expand_more
@@ -115,17 +143,20 @@ export function Navbar({
 
               {/* Wallet Dropdown */}
               {showWalletMenu && (
-                <div className="absolute right-0 mt-2 w-56 rounded-xl bg-surface-container-high border border-surface-container-highest shadow-2xl p-2 z-50 flex flex-col gap-1 font-body-sm animate-in fade-in zoom-in-95 duration-150">
-                  <div className="px-3 py-2 border-b border-surface-container-highest/60">
+                <div className="absolute right-0 mt-2 w-64 rounded-xl bg-surface-container-high border border-surface-container-highest shadow-2xl p-2 z-50 flex flex-col gap-1 font-body-sm animate-in fade-in zoom-in-95 duration-150">
+                  <div className="px-3 py-2 border-b border-surface-container-highest/60 flex flex-col gap-0.5">
                     <span className="font-label-mono-xs text-outline uppercase tracking-wider block">
                       Connected Account
                     </span>
                     <span className="font-label-mono-sm text-on-surface font-semibold truncate block">
-                      {accountId}
+                      {currentAccountId}
+                    </span>
+                    <span className="font-label-mono-xs text-primary font-medium mt-1">
+                      Available: {balance}
                     </span>
                   </div>
                   <a
-                    href="https://testnet.nearblocks.io"
+                    href={`https://testnet.nearblocks.io/address/${currentAccountId}`}
                     target="_blank"
                     rel="noreferrer"
                     className="flex items-center gap-2 px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors"

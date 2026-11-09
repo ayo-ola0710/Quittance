@@ -11,6 +11,7 @@ import {
   TaskCard,
   Pagination,
   DeliverablesModal,
+  LiveExecutionModal,
   FilterCategory,
   TaskItem,
 } from "../types";
@@ -22,6 +23,8 @@ export default function Home() {
   const [selectedSort, setSelectedSort] = useState("Sort: Most Recent");
   const [tasks, setTasks] = useState(initialTasks);
   const [selectedTaskForModal, setSelectedTaskForModal] =
+    useState<TaskItem | null>(null);
+  const [liveExecutionTask, setLiveExecutionTask] =
     useState<TaskItem | null>(null);
 
   // Compute category counts
@@ -105,6 +108,7 @@ export default function Home() {
                     key={task.id}
                     task={task}
                     onInspect={(t) => setSelectedTaskForModal(t)}
+                    onViewLive={(t) => setLiveExecutionTask(t)}
                   />
                 ))
               ) : (
@@ -140,6 +144,13 @@ export default function Home() {
         task={selectedTaskForModal}
         isOpen={Boolean(selectedTaskForModal)}
         onClose={() => setSelectedTaskForModal(null)}
+      />
+
+      {/* Live Execution Log Modal */}
+      <LiveExecutionModal
+        task={liveExecutionTask}
+        isOpen={Boolean(liveExecutionTask)}
+        onClose={() => setLiveExecutionTask(null)}
       />
     </>
   );

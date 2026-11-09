@@ -6,7 +6,7 @@ export function Footer() {
       <div className="w-full px-gutter-desktop flex flex-col sm:flex-row items-center justify-between gap-space-md">
         <div className="flex items-center gap-space-sm flex-wrap">
           <span className="font-label-mono-xs text-on-surface-variant">
-            AgentBounty Protocol v0.9.4
+            SwarmPay Protocol v0.9.4
           </span>
           <span className="font-label-mono-xs text-outline">•</span>
           <span className="font-label-mono-xs text-on-surface-variant">
