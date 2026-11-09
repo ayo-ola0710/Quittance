@@ -1,69 +1,146 @@
-import Image from "next/image";
+"use client";
+
+import React, { useState, useMemo } from "react";
+import {
+  Navbar,
+  Footer,
+  DashboardHeader,
+  MetricCard,
+  MissionLaunchpad,
+  FilterBar,
+  TaskCard,
+  Pagination,
+  DeliverablesModal,
+  FilterCategory,
+  TaskItem,
+} from "../types";
+import { initialMetrics, initialTasks } from "../data/mockData";
 
 export default function Home() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedFilter, setSelectedFilter] = useState<FilterCategory>("all");
+  const [selectedSort, setSelectedSort] = useState("Sort: Most Recent");
+  const [tasks, setTasks] = useState(initialTasks);
+  const [selectedTaskForModal, setSelectedTaskForModal] =
+    useState<TaskItem | null>(null);
+
+  // Compute category counts
+  const counts = useMemo(() => {
+    return {
+      all: 34,
+      active: 2,
+      completed: 28,
+      drafts: 4,
+    };
+  }, []);
+
+  // Filter tasks based on search input and selected tab
+  const filteredTasks = useMemo(() => {
+    return tasks.filter((task) => {
+      // Filter by category tab
+      if (selectedFilter === "active" && task.status !== "active") return false;
+      if (selectedFilter === "completed" && task.status !== "completed")
+        return false;
+      if (selectedFilter === "drafts" && task.status !== "draft") return false;
+
+      // Filter by search query
+      if (searchQuery.trim()) {
+        const query = searchQuery.toLowerCase();
+        const matchesTitle = task.title.toLowerCase().includes(query);
+        const matchesId = task.id.toLowerCase().includes(query);
+        const matchesCategory = task.category.toLowerCase().includes(query);
+        const matchesAgent = task.agents?.some(
+          (agent) =>
+            agent.name.toLowerCase().includes(query) ||
+            (agent.handle && agent.handle.toLowerCase().includes(query)),
+        );
+        return matchesTitle || matchesId || matchesCategory || matchesAgent;
+      }
+
+      return true;
+    });
+  }, [tasks, selectedFilter, searchQuery]);
+
+  const handleRefresh = () => {
+    // Simulated state refresh
+    setTasks([...initialTasks]);
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
+    <>
+      <Navbar />
+
+      <main className="w-full pt-16 bg-background min-h-screen">
+        <div className="flex flex-col w-full">
+          <div className="w-full px-gutter-desktop py-space-lg flex flex-col gap-space-lg max-w-[1600px] mx-auto">
+            {/* Header Section */}
+            <DashboardHeader onRefresh={handleRefresh} />
+
+            {/* Metric Cards Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-space-md">
+              {initialMetrics.map((metric, idx) => (
+                <MetricCard key={idx} item={metric} />
+              ))}
+            </div>
+
+            {/* Quick Navigation Launchpad */}
+            <MissionLaunchpad />
+
+            {/* Search & Filters Toolbar */}
+            <FilterBar
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              selectedFilter={selectedFilter}
+              onFilterChange={setSelectedFilter}
+              selectedSort={selectedSort}
+              onSortChange={setSelectedSort}
+              counts={counts}
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+            {/* Tasks List Container */}
+            <div className="flex flex-col gap-space-md">
+              {filteredTasks.length > 0 ? (
+                filteredTasks.map((task) => (
+                  <TaskCard
+                    key={task.id}
+                    task={task}
+                    onInspect={(t) => setSelectedTaskForModal(t)}
+                  />
+                ))
+              ) : (
+                <div className="rounded-xl bg-surface-container/40 p-space-xl text-center flex flex-col items-center justify-center gap-space-sm border border-surface-container-high/40">
+                  <span className="material-symbols-outlined text-[32px] text-outline">
+                    search_off
+                  </span>
+                  <p className="font-headline-sm text-on-surface">
+                    No tasks found
+                  </p>
+                  <p className="font-body-sm text-on-surface-variant">
+                    Try adjusting your search query or filter settings.
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Pagination & Trust Footnote */}
+            <Pagination
+              currentPage={1}
+              startItem={1}
+              endItem={filteredTasks.length}
+              totalItems={counts[selectedFilter]}
+            />
+          </div>
         </div>
       </main>
-    </div>
+
+      <Footer />
+
+      {/* Deliverables Inspector Modal */}
+      <DeliverablesModal
+        task={selectedTaskForModal}
+        isOpen={Boolean(selectedTaskForModal)}
+        onClose={() => setSelectedTaskForModal(null)}
+      />
+    </>
   );
 }
