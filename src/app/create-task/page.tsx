@@ -81,6 +81,7 @@ export default function CreateTaskPage() {
             {/* Step 3: Execution & Settle Escrow */}
             {currentStep === 3 && (
               <DynamicStepSettlement
+                directivePrompt={directivePrompt}
                 onReset={handleResetFlow}
                 onShowToast={showToast}
               />

@@ -70,7 +70,7 @@ export function Navbar({
           <Link href="/" className="flex items-center gap-space-xs group">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              alt="AgentBounty Swarm Logo"
+              alt="SwarmPay Logo"
               className="h-8 w-auto object-contain transition-transform group-hover:scale-105"
               src="/logo.png"
             />

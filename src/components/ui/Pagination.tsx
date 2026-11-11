@@ -16,7 +16,7 @@ export function Pagination({
   endItem = 5,
   totalItems = 34,
   onPageChange,
-  contractAddress = "escrow.agentbounty.testnet",
+  contractAddress = "treasury.swarmpay.testnet",
 }: PaginationProps) {
   return (
     <div className="flex flex-col sm:flex-row items-center justify-between gap-space-md pt-space-md pb-space-xl text-on-surface-variant font-label-mono-xs">
@@ -77,13 +77,13 @@ export function Pagination({
         </button>
       </div>
 
-      {/* Escrow Guarantee Contract Link */}
+      {/* Agent Treasury Engine Link */}
       <div className="flex items-center gap-1.5 text-on-surface-variant">
         <span className="material-symbols-outlined text-tertiary text-[14px]">
           format_image_left
         </span>
         <span>
-          Escrow held in non-custodial NEAR contract:{" "}
+          Disbursements managed by Agent Treasury Engine:{" "}
           <code className="text-primary font-mono">{contractAddress}</code>
         </span>
       </div>

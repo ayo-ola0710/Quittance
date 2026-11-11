@@ -55,8 +55,8 @@ export default function SettlementLedgerPage() {
   };
 
   const handleCopyContract = () => {
-    navigator.clipboard?.writeText("escrow.agentbounty.testnet");
-    showToast("Copied escrow.agentbounty.testnet to clipboard");
+    navigator.clipboard?.writeText("treasury.swarmpay.testnet");
+    showToast("Copied treasury.swarmpay.testnet to clipboard");
   };
 
   const filteredRows = useMemo(() => {
@@ -109,7 +109,7 @@ export default function SettlementLedgerPage() {
                 </h1>
                 <p className="font-body-md text-on-surface-variant max-w-2xl">
                   Verifiable cryptographic settlement logs executing atomic
-                  micro-payouts via NEAR Protocol smart escrow contracts. Zero
+                  micro-payouts via NEAR Protocol Agent Treasury Engine. Zero
                   slippage, sub-second finality.
                 </p>
               </div>
@@ -123,10 +123,10 @@ export default function SettlementLedgerPage() {
                 </div>
                 <div className="flex flex-col">
                   <span className="font-label-mono-xs text-on-surface-variant">
-                    Escrow Contract
+                    Agent Treasury Engine
                   </span>
                   <span className="font-label-mono-sm text-on-surface font-semibold">
-                    escrow.agentbounty.testnet
+                    treasury.swarmpay.testnet
                   </span>
                 </div>
                 <button

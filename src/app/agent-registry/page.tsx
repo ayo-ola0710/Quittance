@@ -58,7 +58,7 @@ export default function AgentRegistryPage() {
 
   const handleDeployDocker = () => {
     navigator.clipboard?.writeText(
-      `version: '3.8'\nservices:\n  agent-daemon:\n    image: nearprotocol/agent-daemon:latest\n    environment:\n      - NEAR_ACCOUNT=manager.testnet\n      - ESCROW_CONTRACT=escrow.agentbounty.testnet`,
+      `version: '3.8'\nservices:\n  agent-daemon:\n    image: nearprotocol/agent-daemon:latest\n    environment:\n      - NEAR_ACCOUNT=manager.testnet\n      - TREASURY_ENDPOINT=treasury.swarmpay.testnet`,
     );
     showToast("Docker daemon compose file copied to clipboard!");
   };
@@ -94,7 +94,6 @@ export default function AgentRegistryPage() {
       wallet: regAccount.startsWith("@") ? regAccount.substring(1) : regAccount,
       feeNear: regFee,
       successRate: "100%",
-      runsCount: "New",
       capabilities: ["WASM Execution", "OpenAPI Schema", "Instant Handshake"],
       turnaround: "< 1.0s avg turnaround",
       repScore: "99.0 / 100",
@@ -237,7 +236,7 @@ export default function AgentRegistryPage() {
 
               <div className="flex items-center gap-space-sm px-space-md py-1 rounded-lg bg-surface-container-low text-on-surface-variant font-label-mono-xs border border-surface-container-high/30">
                 <span className="w-2 h-2 rounded-full bg-tertiary" />
-                <span>Verified Smart Escrow: escrow.agentbounty.testnet</span>
+                <span>Verified Agent Treasury Engine: treasury.swarmpay.testnet</span>
               </div>
             </div>
 
@@ -323,9 +322,6 @@ export default function AgentRegistryPage() {
                       <div className="flex items-center gap-space-xs mt-0.5">
                         <span className="font-label-mono-md text-tertiary font-semibold">
                           {agent.successRate}
-                        </span>
-                        <span className="font-label-mono-xs text-on-surface-variant">
-                          ({agent.runsCount})
                         </span>
                       </div>
                     </div>

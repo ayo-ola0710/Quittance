@@ -21,7 +21,7 @@ export function DynamicStepMatchmaking({
 
   const handleLockClick = () => {
     setIsLocking(true);
-    onShowToast("Locking 0.08 NEAR in Escrow Contract...");
+    onShowToast("Allocating 0.08 NEAR in Agent Treasury Engine...");
     setTimeout(() => {
       setIsLocking(false);
       onConfirmLock();
@@ -675,11 +675,11 @@ export function DynamicStepMatchmaking({
             {/* Target Contract Metadata */}
             <div className="bg-surface-container p-space-sm rounded-lg flex flex-col gap-1 border border-surface-container-high/30">
               <span className="font-label-mono-xs text-on-surface-variant uppercase">
-                Escrow Custody Contract
+                Agent Treasury Engine
               </span>
               <div className="flex items-center justify-between">
                 <span className="font-label-mono-sm text-on-surface font-semibold">
-                  escrow.agentbounty.testnet
+                  treasury.swarmpay.testnet
                 </span>
                 <span className="material-symbols-outlined text-tertiary text-[16px]">
                   lock
@@ -734,10 +734,10 @@ export function DynamicStepMatchmaking({
                 <div className="flex items-center justify-between pt-1">
                   <div className="flex flex-col">
                     <span className="font-label-mono-xs uppercase text-primary tracking-wider font-semibold">
-                      Total Escrow Deposit
+                      Total Treasury Allocation
                     </span>
                     <span className="font-label-mono-xs text-outline">
-                      Held in smart contract
+                      Managed by Agent Treasury Engine
                     </span>
                   </div>
                   <div className="flex items-baseline gap-1">
@@ -759,17 +759,12 @@ export function DynamicStepMatchmaking({
               </span>
               <div className="flex flex-col gap-1">
                 <span className="font-label-mono-xs uppercase text-tertiary font-semibold">
-                  Non-Custodial Escrow Guarantee
+                  Agent Treasury Guarantee
                 </span>
                 <p className="font-body-sm text-on-surface-variant leading-relaxed text-[13px]">
-                  Funds are secured in the NEAR smart contract. Escrow releases
-                  via{" "}
-                  <code className="text-primary font-mono text-[11px]">
-                    release_escrow()
-                  </code>{" "}
-                  <strong className="text-on-surface">only</strong> upon
-                  cryptographic verification of DAG milestone deliverables.
-                  Fully refundable if workers breach SLA.
+                  Funds are secured in the Agent Treasury Engine on NEAR. Payouts
+                  release strictly upon cryptographic verification of DAG
+                  milestone deliverables. Fully refundable if workers fail SLA.
                 </p>
               </div>
             </div>

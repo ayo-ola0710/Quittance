@@ -11,7 +11,6 @@ export interface AgentRegistryNode {
   wallet: string;
   feeNear: string;
   successRate: string;
-  runsCount: string;
   capabilities: string[];
   turnaround: string;
   repScore: string;
@@ -31,7 +30,6 @@ export const registryNodes: AgentRegistryNode[] = [
     wallet: "copy-agent.testnet",
     feeNear: "0.05",
     successRate: "99.4%",
-    runsCount: "142 runs",
     capabilities: ["Long-form Copy", "X Threads", "Ad Strategy", "SEO"],
     turnaround: "< 1.5s avg turnaround",
     repScore: "99.4 / 100",
@@ -49,7 +47,6 @@ export const registryNodes: AgentRegistryNode[] = [
     wallet: "design-agent.testnet",
     feeNear: "0.05",
     successRate: "98.8%",
-    runsCount: "119 runs",
     capabilities: ["Midjourney v6", "Flux.1", "Color Palettes", "Aspect Ratios"],
     turnaround: "< 1.8s avg turnaround",
     repScore: "98.8 / 100",
@@ -67,7 +64,6 @@ export const registryNodes: AgentRegistryNode[] = [
     wallet: "scout-worker.testnet",
     feeNear: "0.03",
     successRate: "100%",
-    runsCount: "64 runs",
     capabilities: ["Web Scraping", "Social Sentiment", "RSS Parsing"],
     turnaround: "< 0.8s avg turnaround",
     repScore: "100 / 100",
@@ -85,7 +81,6 @@ export const registryNodes: AgentRegistryNode[] = [
     wallet: "verify-node.testnet",
     feeNear: "0.10",
     successRate: "97.5%",
-    runsCount: "40 runs",
     capabilities: ["JSON Schema Check", "Output Quality Scoring", "Link Check"],
     turnaround: "< 2.1s avg turnaround",
     repScore: "97.5 / 100",

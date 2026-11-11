@@ -81,7 +81,7 @@ export const initialTasks: TaskItem[] = [
     escrow: {
       amount: "0.080",
       unit: "NEAR",
-      reference: "Smart Escrow #ES-9912",
+      reference: "Agent Treasury Engine #TR-9912",
     },
     actionLabel: "View Live Execution",
     actionHref: "#",
@@ -108,7 +108,7 @@ export const initialTasks: TaskItem[] = [
     escrow: {
       amount: "0.250",
       unit: "NEAR",
-      reference: "Smart Escrow #ES-9911",
+      reference: "Agent Treasury Engine #TR-9911",
     },
     actionLabel: "View Live Execution",
     actionHref: "#",

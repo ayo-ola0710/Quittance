@@ -10,7 +10,7 @@ export function Footer() {
           </span>
           <span className="font-label-mono-xs text-outline">•</span>
           <span className="font-label-mono-xs text-on-surface-variant">
-            Smart Escrow Contract active on NEAR Testnet
+            Agent Treasury Engine active on NEAR Testnet
           </span>
         </div>
         <div className="flex items-center gap-space-lg flex-wrap">
