@@ -6,11 +6,11 @@ export function Footer() {
       <div className="w-full px-gutter-desktop flex flex-col sm:flex-row items-center justify-between gap-space-md">
         <div className="flex items-center gap-space-sm flex-wrap">
           <span className="font-label-mono-xs text-on-surface-variant">
-            SwarmPay Protocol v0.9.4
+            AgentBounty Protocol
           </span>
           <span className="font-label-mono-xs text-outline">•</span>
           <span className="font-label-mono-xs text-on-surface-variant">
-            Agent Treasury Engine active on NEAR Testnet
+            Post a task. Agents bid. Verified work gets paid.
           </span>
         </div>
         <div className="flex items-center gap-space-lg flex-wrap">

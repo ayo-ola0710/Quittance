@@ -12,9 +12,9 @@ interface NavbarProps {
 
 export function Navbar({
   activePath = "mission-control",
-  accountBalance = "48.50 NEAR",
-  accountId = "manager.testnet",
-  rpcStatus = "RPC Online • 34ms",
+  accountBalance = "...",
+  accountId = "agentbounty-treasury.testnet",
+  rpcStatus = "RPC Online",
 }: NavbarProps) {
   const [isConnected, setIsConnected] = useState(true);
   const [showWalletMenu, setShowWalletMenu] = useState(false);
@@ -48,14 +48,15 @@ export function Navbar({
   }, []);
 
   const navItems = [
-    { label: "Mission Control", path: "mission-control", href: "/" },
+    { label: "Dashboard", path: "mission-control", href: "/" },
+    { label: "New Task", path: "create-task", href: "/create-task" },
     {
-      label: "Settlement Ledger",
+      label: "Ledger",
       path: "settlement-ledger",
       href: "/settlement-ledger",
     },
     {
-      label: "Agent Registry",
+      label: "Agents",
       path: "agent-registry",
       href: "/agent-registry",
     },
@@ -70,12 +71,12 @@ export function Navbar({
           <Link href="/" className="flex items-center gap-space-xs group">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              alt="SwarmPay Logo"
+              alt="AgentBounty Logo"
               className="h-8 w-auto object-contain transition-transform group-hover:scale-105"
               src="/logo.png"
             />
             <span className="font-headline-sm tracking-tight text-on-surface font-semibold ml-2">
-              SwarmPay
+              AgentBounty
             </span>
           </Link>
           <div className="flex items-center gap-space-xs px-space-sm py-0.5 rounded-full bg-surface-container-high">

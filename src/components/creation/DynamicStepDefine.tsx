@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 interface DynamicStepDefineProps {
   onContinue: (directive: string, budget: string) => void;
@@ -16,6 +16,26 @@ export function DynamicStepDefine({
   );
   const [category, setCategory] = useState("Market Intelligence");
   const [budget, setBudget] = useState("0.08");
+  const [walletBalance, setWalletBalance] = useState<string>("Checking...");
+
+  useEffect(() => {
+    let mounted = true;
+    fetch("/api/account")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (mounted && data?.balance) {
+          setWalletBalance(data.balance);
+        } else if (mounted) {
+          setWalletBalance("NEAR Testnet");
+        }
+      })
+      .catch(() => {
+        if (mounted) setWalletBalance("NEAR Testnet");
+      });
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const categories = [
     "Market Intelligence",
@@ -68,20 +88,18 @@ export function DynamicStepDefine({
       <div className="flex flex-col gap-space-xs">
         <div className="flex items-center gap-space-sm flex-wrap">
           <span className="font-label-mono-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary uppercase font-semibold">
-            Step 1: Intent Specification
+            Step 1 of 3
           </span>
           <span className="font-label-mono-xs text-outline">•</span>
           <span className="font-label-mono-xs text-tertiary">
-            Autonomous DAG Decomposition Engine Ready
+            Post a task. Agents bid. Verified work gets paid.
           </span>
         </div>
         <h1 className="font-headline-lg text-on-surface tracking-tight font-semibold">
-          Define Bounty Directive &amp; Escrow Budget
+          What do you need done?
         </h1>
         <p className="font-body-md text-on-surface-variant max-w-2xl">
-          Describe your task in natural language. The orchestrator will parse
-          your intent, decompose it into parallel sub-tasks, and match candidate
-          agent nodes.
+          Describe your task in plain English. Two AI agents will work on it in parallel — one researches, one writes. Only verified work gets paid.
         </p>
       </div>
 
@@ -98,7 +116,7 @@ export function DynamicStepDefine({
                 htmlFor="directive-textarea"
                 className="font-label-mono-xs uppercase text-on-surface-variant tracking-wider font-semibold"
               >
-                Mission Directive (Natural Language)
+                Your Task Description
               </label>
               <span className="font-label-mono-xs text-outline">
                 {prompt.length} characters
@@ -110,7 +128,7 @@ export function DynamicStepDefine({
                 rows={4}
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
-                placeholder="E.g. Scrape market intelligence, analyze sentiment, and synthesize an executive report..."
+                placeholder="E.g. Write a launch campaign for my NEAR-based payment app. Target audience: Shopify merchants. Highlight low fees and instant settlement."
                 className="w-full bg-surface-container-lowest text-on-surface p-space-md rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-primary shadow-inner border border-surface-container-high/40 resize-none"
               />
             </div>
@@ -119,7 +137,7 @@ export function DynamicStepDefine({
           {/* Quick Presets */}
           <div className="flex flex-col gap-space-xs pt-1">
             <span className="font-label-mono-xs text-outline uppercase tracking-wider">
-              Quick Mission Presets
+              Example Tasks (click to load)
             </span>
             <div className="flex flex-wrap gap-2">
               {presets.map((p, idx) => (
@@ -141,7 +159,7 @@ export function DynamicStepDefine({
           {/* Category Selector */}
           <div className="flex flex-col gap-space-xs pt-2">
             <label className="font-label-mono-xs text-on-surface-variant uppercase tracking-wider font-semibold">
-              Bounty Domain Category
+              Task Type
             </label>
             <div className="flex flex-wrap gap-2">
               {categories.map((cat) => {
@@ -164,14 +182,14 @@ export function DynamicStepDefine({
             </div>
           </div>
 
-          {/* Budget & Target SLA */}
+          {/* Budget & Delivery Time */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-space-md pt-space-xs border-t border-surface-container-high/30 mt-space-sm">
             <div className="flex flex-col gap-1">
               <label
                 htmlFor="budget-input"
                 className="font-label-mono-xs uppercase text-on-surface-variant tracking-wider font-semibold"
               >
-                Escrow Budget Cap (NEAR)
+                Max Task Budget (NEAR)
               </label>
               <div className="relative">
                 <input
@@ -188,39 +206,39 @@ export function DynamicStepDefine({
                 </span>
               </div>
               <span className="font-label-mono-xs text-outline">
-                ≈ ${(parseFloat(budget || "0") * 5.2).toFixed(2)} USD
+                Standard 2-agent rate: 0.03 Research + 0.05 Writing
               </span>
             </div>
 
             <div className="flex flex-col gap-1">
               <label className="font-label-mono-xs uppercase text-on-surface-variant tracking-wider font-semibold">
-                Target SLA SLA Deadline
+                Estimated Delivery
               </label>
               <div className="p-2.5 rounded-lg bg-surface-container-lowest flex items-center justify-between border border-surface-container-high/40">
                 <span className="font-label-mono-sm text-tertiary font-semibold flex items-center gap-1">
                   <span className="material-symbols-outlined text-[16px]">
                     bolt
                   </span>
-                  Sub-second DAG (Avg 1.8s)
+                  ~2–5 seconds (Live AI)
                 </span>
                 <span className="font-label-mono-xs text-outline">
-                  Deterministic
+                  Auto-verified
                 </span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Right Column: Decomposition Overview Box & CTA */}
+        {/* Right Column: How It Works Box & CTA */}
         <div className="xl:col-span-4 flex flex-col gap-space-md">
           <div className="bg-surface-container-low rounded-xl p-space-lg shadow-xl flex flex-col gap-space-md border border-surface-container-high/40">
             <div className="flex items-center justify-between pb-space-sm border-b border-surface-container-high/30">
               <span className="font-label-mono-xs text-on-surface-variant uppercase tracking-wider font-semibold">
-                Orchestration Engine
+                How It Works
               </span>
               <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full font-label-mono-xs font-medium tracking-wide bg-tertiary/10 text-tertiary">
                 <span className="w-1.5 h-1.5 rounded-full bg-tertiary" />
-                Active
+                Ready
               </span>
             </div>
 
@@ -228,15 +246,15 @@ export function DynamicStepDefine({
               <div className="p-space-sm rounded-lg bg-surface-container-lowest flex items-center gap-space-sm border border-surface-container-high/30">
                 <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
                   <span className="material-symbols-outlined text-[18px]">
-                    schema
+                    splitscreen
                   </span>
                 </div>
                 <div className="flex flex-col min-w-0">
                   <span className="font-body-md text-on-surface font-medium truncate">
-                    Automated Decomposition
+                    1. Split Into 2 Jobs
                   </span>
                   <span className="font-label-mono-xs text-on-surface-variant truncate">
-                    Deconstructs into parallel sub-tasks
+                    One agent researches, one agent writes
                   </span>
                 </div>
               </div>
@@ -244,15 +262,15 @@ export function DynamicStepDefine({
               <div className="p-space-sm rounded-lg bg-surface-container-lowest flex items-center gap-space-sm border border-surface-container-high/30">
                 <div className="w-8 h-8 rounded-lg bg-secondary/10 text-secondary flex items-center justify-center shrink-0">
                   <span className="material-symbols-outlined text-[18px]">
-                    hub
+                    gavel
                   </span>
                 </div>
                 <div className="flex flex-col min-w-0">
                   <span className="font-body-md text-on-surface font-medium truncate">
-                    Registry Matchmaking
+                    2. Agents Compete
                   </span>
                   <span className="font-label-mono-xs text-on-surface-variant truncate">
-                    Evaluates nodes by SLA, score &amp; rate
+                    Cheapest agent with rep &gt; 95 wins
                   </span>
                 </div>
               </div>
@@ -260,15 +278,15 @@ export function DynamicStepDefine({
               <div className="p-space-sm rounded-lg bg-surface-container-lowest flex items-center gap-space-sm border border-surface-container-high/30">
                 <div className="w-8 h-8 rounded-lg bg-tertiary/10 text-tertiary flex items-center justify-center shrink-0">
                   <span className="material-symbols-outlined text-[18px]">
-                    lock
+                    verified_user
                   </span>
                 </div>
                 <div className="flex flex-col min-w-0">
                   <span className="font-body-md text-on-surface font-medium truncate">
-                    Non-Custodial Escrow
+                    3. Pay Only Verified Work
                   </span>
                   <span className="font-label-mono-xs text-on-surface-variant truncate">
-                    Deposited directly on NEAR testnet
+                    Bad outputs get blocked automatically
                   </span>
                 </div>
               </div>
@@ -276,9 +294,9 @@ export function DynamicStepDefine({
 
             <div className="pt-space-sm border-t border-surface-container-high/30 flex flex-col gap-space-sm">
               <div className="flex items-center justify-between text-on-surface-variant font-label-mono-xs">
-                <span>Wallet Available:</span>
+                <span>Manager Balance:</span>
                 <span className="text-on-surface font-semibold">
-                  48.50 NEAR
+                  {walletBalance}
                 </span>
               </div>
 
@@ -286,7 +304,7 @@ export function DynamicStepDefine({
                 type="submit"
                 className="w-full flex items-center justify-center gap-space-sm py-3 px-space-md rounded-xl bg-linear-to-r from-primary-container to-primary text-on-primary-container font-headline-sm font-semibold shadow-[0_0_24px_rgba(6,182,212,0.4)] hover:shadow-[0_0_32px_rgba(6,182,212,0.65)] active:scale-95 transition-all cursor-pointer"
               >
-                <span>Continue to Matchmaking</span>
+                <span>Find Agents &amp; Get Bids</span>
                 <span className="material-symbols-outlined text-[20px]">
                   arrow_forward
                 </span>

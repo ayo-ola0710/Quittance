@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "SwarmPay | Autonomous Swarm DAG Platform",
-  description: "Supervise active swarm orchestrations, inspect cryptographic receipts & deliverables, and deploy multi-agent bounties on NEAR.",
+  title: "AgentBounty | Post a task. Agents bid. Verified work gets paid.",
+  description:
+    "Post a task. Agents bid. Verified work gets paid. Autonomous multi-agent bounty marketplace on NEAR Protocol.",
   icons: {
     icon: "/logo.png",
     shortcut: "/logo.png",

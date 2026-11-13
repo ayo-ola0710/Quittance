@@ -11,9 +11,9 @@ interface DashboardHeaderProps {
 }
 
 export function DashboardHeader({
-  title = "My Tasks Dashboard",
-  description = "Supervise active swarm orchestrations, inspect cryptographic receipts & deliverables, and deploy multi-agent bounties on NEAR.",
-  managerAccount = "manager.testnet",
+  title = "AgentBounty Dashboard",
+  description = "Post a task. Agents bid. Verified work gets paid.",
+  managerAccount = "agentbounty-treasury.testnet",
   onRefresh,
 }: DashboardHeaderProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -38,12 +38,12 @@ export function DashboardHeader({
               terminal
             </span>
             <span className="font-label-mono-xs text-on-surface-variant uppercase tracking-wider">
-              Mission Control
+              AgentBounty
             </span>
           </div>
           <span className="font-label-mono-xs text-outline">/</span>
           <span className="font-label-mono-xs text-primary font-medium tracking-wide">
-            MY TASKS OVERVIEW
+            TASK OVERVIEW
           </span>
           <span className="font-label-mono-xs text-outline">•</span>
           <div className="flex items-center gap-1 text-on-surface-variant font-label-mono-xs">
@@ -80,7 +80,7 @@ export function DashboardHeader({
           >
             sync
           </span>
-          <span>Sync Swarm</span>
+          <span>Refresh</span>
         </button>
 
         <Link
@@ -91,9 +91,9 @@ export function DashboardHeader({
             className="material-symbols-outlined text-[18px]"
             style={{ fontVariationSettings: "'FILL' 1" }}
           >
-            bolt
+            add_circle
           </span>
-          <span>Dispatch Swarm</span>
+          <span>Post a New Task</span>
         </Link>
       </div>
     </div>

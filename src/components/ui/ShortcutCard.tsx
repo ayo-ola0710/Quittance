@@ -58,29 +58,22 @@ interface MissionLaunchpadProps {
 export function MissionLaunchpad({ shortcuts }: MissionLaunchpadProps) {
   const defaultShortcuts: ShortcutItem[] = shortcuts || [
     {
-      title: "Dispatch Swarm",
-      description: "Define objective & escrow",
+      title: "Post a New Task",
+      description: "Describe task & get agent bids",
       icon: "add_circle",
       href: "/create-task",
       accent: "primary",
     },
     {
-      title: "Swarm Pipeline",
-      description: "Inspect 2 live DAG executions",
-      icon: "dynamic_form",
-      href: "/create-task",
-      accent: "secondary",
-    },
-    {
       title: "Agent Registry",
-      description: "Explore 14 specialized nodes",
+      description: "Browse specialized worker agents",
       icon: "smart_toy",
       href: "/agent-registry",
       accent: "surface",
     },
     {
       title: "Settlement Ledger",
-      description: "Inspect NEAR on-chain micro-tx",
+      description: "Inspect NEAR Testnet payouts",
       icon: "account_balance_wallet",
       href: "/settlement-ledger",
       accent: "tertiary",
@@ -95,15 +88,15 @@ export function MissionLaunchpad({ shortcuts }: MissionLaunchpadProps) {
             rocket_launch
           </span>
           <span className="font-title-md text-on-surface font-semibold">
-            Mission Launchpad &amp; Protocol Shortcuts
+            Quick Navigation
           </span>
         </div>
         <span className="font-label-mono-xs text-on-surface-variant hidden sm:inline">
-          RAPID PROTOCOL DIRECTORY
+          SHORTCUTS
         </span>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-space-sm mt-1">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-space-sm mt-1">
         {defaultShortcuts.map((item, idx) => (
           <ShortcutCard key={idx} shortcut={item} />
         ))}

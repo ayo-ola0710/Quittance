@@ -61,24 +61,24 @@ export function StepTracker({
               }`}
             >
               {currentStep > 1
-                ? "Step 01 • Completed"
+                ? "Step 01 • Done"
                 : currentStep === 1
-                ? "Step 01 • In Progress"
+                ? "Step 01 • Current"
                 : "Step 01"}
             </span>
             <span className="font-title-md text-on-surface truncate">
-              Define Objective
+              Write Task
             </span>
             <span className="font-label-mono-xs text-on-surface-variant truncate">
               {currentStep > 1
-                ? "Objective parsed & budget set"
-                : "Define Objective & Escrow"}
+                ? "Task & budget ready"
+                : "Describe what you need"}
             </span>
           </div>
 
           {currentStep > 1 && (
             <div className="ml-auto hidden xl:flex items-center gap-1 text-tertiary font-label-mono-xs">
-              Completed
+              Done
             </div>
           )}
         </div>
@@ -130,10 +130,10 @@ export function StepTracker({
                 }`}
               >
                 {currentStep > 2
-                  ? "Step 02 • Locked"
+                  ? "Step 02 • Done"
                   : currentStep === 2
-                  ? "Step 02 • Matchmaking"
-                  : "Step 02 • Pending"}
+                  ? "Step 02 • Current"
+                  : "Step 02 • Next"}
               </span>
               {currentStep > 2 && (
                 <span className="px-1.5 py-0.2 rounded-full bg-surface-container-highest font-label-mono-xs text-primary">
@@ -142,14 +142,14 @@ export function StepTracker({
               )}
             </div>
             <span className="font-title-md text-on-surface truncate">
-              {currentStep > 2 ? "Matchmaking & Lock" : "Agent Swarm Allocation"}
+              Agents Bid
             </span>
             <span className="font-label-mono-xs text-on-surface-variant truncate">
               {currentStep === 2
-                ? "2 Optimal Agents Identified"
+                ? "Review bids & pick winner"
                 : currentStep > 2
-                ? "Autonomous lock verified"
-                : "Matchmaking & Approval"}
+                ? "Agents assigned"
+                : "Pick qualified agents"}
             </span>
           </div>
 
@@ -190,23 +190,23 @@ export function StepTracker({
                   currentStep === 3 ? "text-tertiary" : "text-on-surface-variant"
                 }`}
               >
-                {currentStep === 3 ? "Step 03 • Current" : "Step 03 • Pending Lock"}
+                {currentStep === 3 ? "Step 03 • Current" : "Step 03 • Final"}
               </span>
               {currentStep === 3 && (
                 <span className="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse" />
               )}
             </div>
             <span className="font-title-md text-on-surface truncate">
-              Execution &amp; Settle Escrow
+              Verify &amp; Pay
             </span>
             <span className="font-label-mono-xs text-outline truncate">
-              {currentStep === 3 ? "Payouts Ready" : "Autonomous on-chain DAG release"}
+              {currentStep === 3 ? "Review & release NEAR" : "Check work & pay in NEAR"}
             </span>
           </div>
 
           {currentStep === 3 && (
             <div className="ml-auto hidden sm:flex items-center px-space-sm py-1 rounded-full bg-tertiary-container/30 text-tertiary font-label-mono-xs">
-              Payouts Ready
+              Ready
             </div>
           )}
         </div>

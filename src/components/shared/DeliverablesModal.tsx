@@ -164,7 +164,7 @@ export function DeliverablesModal({
                     <div className="p-3 rounded-lg bg-surface-container-lowest border border-surface-container-high/60">
                       <span className="text-primary font-semibold">4/8</span> 🎨
                       Experience the full campaign visual suite and claim your
-                      genesis sampler at coffee.swarmpay.testnet! 🚀
+                      genesis sampler at coffee.agentbounty.testnet! 🚀
                     </div>
                   </div>
                 </div>
@@ -292,7 +292,7 @@ export function DeliverablesModal({
               <pre className="p-space-md rounded-xl bg-surface-container font-mono text-[12px] text-tertiary overflow-x-auto border border-surface-container-high">
                 {JSON.stringify(
                   {
-                    protocol: "SwarmPay DeFi Stream",
+                    protocol: "AgentBounty DeFi Stream",
                     worker: "@scout-worker",
                     status: "verified",
                     arbitrage_pairs: [

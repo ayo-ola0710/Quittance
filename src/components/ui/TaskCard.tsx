@@ -303,30 +303,44 @@ export function TaskCard({ task, onInspect, onViewLive }: TaskCardProps) {
 
             {isCompleted && (
               <>
-                <button
-                  type="button"
-                  onClick={() => onInspect?.(task)}
-                  className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-surface-container-high hover:bg-surface-bright active:scale-95 text-on-surface font-body-sm transition-all duration-150 cursor-pointer"
-                >
-                  <span className="material-symbols-outlined text-[16px]">
-                    {actionLabel?.includes("JSON")
-                      ? "download"
-                      : actionLabel?.includes("Audit")
-                        ? "find_in_page"
-                        : "visibility"}
-                  </span>
-                  <span>{actionLabel || "Inspect Deliverables"}</span>
-                </button>
-                {secondaryActionType === "explorer" && (
+                {actionHref && actionHref !== "#" ? (
                   <Link
+                    href={actionHref}
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-surface-container-high hover:bg-surface-bright active:scale-95 text-on-surface font-body-sm font-medium transition-all duration-150 cursor-pointer"
+                  >
+                    <span className="material-symbols-outlined text-[16px] text-primary">
+                      receipt_long
+                    </span>
+                    <span>{actionLabel || "Open Receipt"}</span>
+                  </Link>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => onInspect?.(task)}
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-surface-container-high hover:bg-surface-bright active:scale-95 text-on-surface font-body-sm transition-all duration-150 cursor-pointer"
+                  >
+                    <span className="material-symbols-outlined text-[16px]">
+                      {actionLabel?.includes("JSON")
+                        ? "download"
+                        : actionLabel?.includes("Audit")
+                          ? "find_in_page"
+                          : "visibility"}
+                    </span>
+                    <span>{actionLabel || "Inspect Deliverables"}</span>
+                  </button>
+                )}
+                {secondaryActionType === "explorer" && explorerHref !== "#" && (
+                  <a
                     href={explorerHref}
+                    target="_blank"
+                    rel="noreferrer"
                     className="inline-flex items-center justify-center p-2 rounded-xl bg-surface-container-high hover:bg-surface-bright active:scale-95 text-on-surface-variant hover:text-on-surface transition-all duration-150"
-                    title="View NEAR Explorer Receipt"
+                    title="View on NearBlocks Explorer"
                   >
                     <span className="material-symbols-outlined text-[18px]">
                       open_in_new
                     </span>
-                  </Link>
+                  </a>
                 )}
               </>
             )}

@@ -10,12 +10,14 @@ import {
   DynamicStepMatchmaking,
   DynamicStepSettlement,
 } from "../../types";
+import type { SelectedWriterAgent } from "@/components/creation/DynamicStepMatchmaking";
 
 export default function CreateTaskPage() {
   const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1);
   const [directivePrompt, setDirectivePrompt] = useState(
     "Scrape competitor social sentiment for #AIagents across NEAR ecosystems and produce an executive alpha digest with sentiment velocity...",
   );
+  const [selectedAgent, setSelectedAgent] = useState<SelectedWriterAgent | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
@@ -28,18 +30,24 @@ export default function CreateTaskPage() {
   const handleStep1Continue = (directive: string) => {
     setDirectivePrompt(directive);
     setCurrentStep(2);
-    showToast("Parsed directive into 2 parallel DAG sub-tasks");
+    showToast("Task ready! Agents submitted bids.");
   };
 
-  const handleStep2ConfirmLock = () => {
+  const handleStep2ConfirmLock = (agent: SelectedWriterAgent) => {
+    setSelectedAgent(agent);
     setCurrentStep(3);
-    showToast("Escrow 0.08 NEAR locked! Swarm executing in parallel...");
+    showToast(`Dispatched to ${agent.name}! Checking outputs...`);
   };
 
   const handleResetFlow = () => {
+    setSelectedAgent(null);
     setCurrentStep(1);
-    showToast("Resetting to Step 1: Define Objective");
+    showToast("Starting a new task");
   };
+
+  const dynamicEscrowAmount = selectedAgent
+    ? `${(0.03 + selectedAgent.bidNear).toFixed(2)} NEAR`
+    : "0.08 NEAR";
 
   return (
     <>
@@ -57,7 +65,7 @@ export default function CreateTaskPage() {
                   setCurrentStep(step);
                 }
               }}
-              escrowAmount="0.08 NEAR"
+              escrowAmount={dynamicEscrowAmount}
             />
 
             {/* Step 1: Define Objective */}
@@ -82,6 +90,7 @@ export default function CreateTaskPage() {
             {currentStep === 3 && (
               <DynamicStepSettlement
                 directivePrompt={directivePrompt}
+                selectedAgent={selectedAgent ?? undefined}
                 onReset={handleResetFlow}
                 onShowToast={showToast}
               />

@@ -7,7 +7,7 @@ export async function GET(req: NextRequest) {
   const accountId =
     url.searchParams.get("accountId") ||
     process.env.MANAGER_ACCOUNT_ID ||
-    "isreel-mgr.testnet";
+    "agentbounty-treasury.testnet";
   const nodeUrl = process.env.NEAR_NODE_URL || "https://rpc.testnet.near.org";
 
   try {

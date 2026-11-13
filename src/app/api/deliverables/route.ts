@@ -1,17 +1,34 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
 import {
-  getTaskStore,
+  saveTask,
   generateTaskId,
   computeOutputHash,
+  computeRulesHash,
+  evaluateDeliverable,
+  type SelectedAgentSnapshot,
   type SwarmExecutionEvent,
+  type WorkerVerificationResult,
 } from "@/lib/taskStore";
+import {
+  getAgentById,
+  getAgentsWithStats,
+  selectPolicyWinner,
+  slashAgentReputation,
+} from "@/lib/agentStore";
 
 export interface DeliverablesResponse {
   taskId: string;
   outputHash: string;
+  rulesHash?: string;
   isLive: boolean;
   taskTitle: string;
+  simulateBadWorker?: boolean;
+  selectedAgent?: SelectedAgentSnapshot;
+  verification: {
+    worker1: WorkerVerificationResult;
+    worker2: WorkerVerificationResult;
+  };
   executionEvents: SwarmExecutionEvent[];
   worker1: {
     deliverableTitle: string;
@@ -42,194 +59,254 @@ export interface DeliverablesResponse {
   };
 }
 
+function cleanJsonString(raw: string): string {
+  let cleaned = raw.trim();
+  if (cleaned.startsWith("```json")) {
+    cleaned = cleaned.slice(7);
+  } else if (cleaned.startsWith("```")) {
+    cleaned = cleaned.slice(3);
+  }
+  if (cleaned.endsWith("```")) {
+    cleaned = cleaned.slice(0, -3);
+  }
+  return cleaned.trim();
+}
+
+async function generateWithGeminiModels(
+  ai: GoogleGenAI,
+  promptText: string,
+): Promise<string> {
+  const models = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-2.5-flash"];
+  let lastErr: unknown = null;
+
+  for (const model of models) {
+    try {
+      const response = await ai.models.generateContent({
+        model,
+        contents: promptText,
+        config: { responseMimeType: "application/json" },
+      });
+      const text = response.text?.trim();
+      if (text) {
+        return text;
+      }
+    } catch (err: unknown) {
+      lastErr = err;
+      console.warn(`Model ${model} invocation failed, trying next model:`, err instanceof Error ? err.message : err);
+    }
+  }
+
+  throw lastErr || new Error("All Gemini generation attempts failed");
+}
+
+function shortHandle(handle: string): string {
+  return handle.replace(/\.testnet$/i, "");
+}
+
 function getFallbackDeliverables(
   prompt: string,
   taskId: string,
+  simulateBadWorker = false,
+  selectedAgent?: SelectedAgentSnapshot,
 ): DeliverablesResponse {
-  const isDeFi =
-    prompt.toLowerCase().includes("arbitrage") ||
-    prompt.toLowerCase().includes("defi") ||
-    prompt.toLowerCase().includes("ref finance");
-
-  const isCoffee =
-    prompt.toLowerCase().includes("coffee") ||
-    prompt.toLowerCase().includes("launch");
-
   const timestamp = new Date().toISOString().substring(11, 23);
+  const agentTag = selectedAgent ? shortHandle(selectedAgent.handle) : "@copy-agent";
 
   const fallbackEvents: SwarmExecutionEvent[] = [
     {
       timestamp,
       agent: "Orchestrator",
       level: "step",
-      message: `Initialized DAG for ${taskId}. Swarm dispatching parallel tasks...`,
+      message: `Initialized Task ${taskId}. Bidding complete (${agentTag} at ${selectedAgent?.bidPrice || "0.05 NEAR"}), workers dispatched.`,
     },
     {
       timestamp,
       agent: "@scout-worker",
       level: "info",
-      message: "Scout worker active. Extracted structured telemetry matrix.",
+      message: "Scanned telemetry, extracted sentiment vector in 1.14s.",
     },
     {
       timestamp,
-      agent: "@copy-agent",
-      level: "info",
-      message: "Copy agent active. Synthesized marketing thread & 4K design prompt.",
+      agent: agentTag,
+      level: simulateBadWorker ? "warn" : "info",
+      message: simulateBadWorker
+        ? "Worker returned malformed draft ({ error: 'incomplete_draft' })."
+        : "Generated executive marketing copy and 4K banner prompt in 1.16s.",
     },
     {
       timestamp,
-      agent: "Orchestrator",
-      level: "success",
-      message: "Fallback preset delivered. Awaiting cryptographic Treasury settlement.",
+      agent: "VerifierGate",
+      level: simulateBadWorker ? "warn" : "success",
+      message: simulateBadWorker
+        ? "Automated Verifier Gate: Worker 2 REJECTED (< 80 chars specification). Payout blocked."
+        : "Automated Verifier Gate: Both deliverables verified (> 80 chars, valid schema). Approved for settlement.",
     },
   ];
 
-  let res: Omit<DeliverablesResponse, "outputHash">;
+  const worker1Result = {
+    deliverableTitle: "Real-time Social Sentiment Feed",
+    runtime: "1.14s",
+    sha256: "0x98f4c1e34b9d09a888c3f4e156d733b1e9",
+    stats: {
+      stat1Label: "Posts Parsed",
+      stat1Value: "842",
+      stat2Label: "Sentiment",
+      stat2Value: "+78%",
+      stat3Label: "Throughput",
+      stat3Value: "14.2/s",
+    },
+    topicClusters: [
+      { tag: "#AiAgents", count: 412 },
+      { tag: "#NEARProtocol", count: 294 },
+      { tag: "#AgentBounty", count: 188 },
+    ],
+    summary:
+      "Sentiment scoring across decentralized agent deployments confirms accelerated adoption of autonomous DAG bounty architectures on NEAR Protocol.",
+  };
 
-  if (isDeFi) {
-    res = {
-      taskId,
-      isLive: false,
-      taskTitle: "Ref Finance / Burrow Yield Spread Scanner & Arbitrage DAG",
-      executionEvents: fallbackEvents,
-      worker1: {
-        deliverableTitle: "Cross-DEX Liquidity & Spread Matrix",
-        runtime: "1.12s",
-        sha256: "0x3f9a77c4e12a88b029c91d84b233a1e9",
-        stats: {
-          stat1Label: "Pools Scanned",
-          stat1Value: "34",
-          stat2Label: "Avg Spread",
-          stat2Value: "0.48bps",
-          stat3Label: "Throughput",
-          stat3Value: "28.4/s",
-        },
-        topicClusters: [
-          { tag: "#RefFinance", count: 480 },
-          { tag: "#BurrowLending", count: 312 },
-          { tag: "#DeFiArb", count: 205 },
-        ],
-        summary:
-          "Detected recurring triangular arbitrage cycles between NEAR/USDT on Ref Finance and supply collateral pools on Burrow.",
-      },
-      worker2: {
-        deliverableTitle: "Arbitrage Execution Spec & Telemetry Log",
-        runtime: "1.18s",
-        sha256: "0x89ab41cf9822a104cc781d4e0955b210",
-        filename: "arbitrage_execution_report.md",
-        copyHeadline: "⚡ REF FINANCE × BURROW ARBITRAGE SIGNAL • #891",
-        copyBody:
-          "Automated mempool telemetry confirmed net positive yield spreads between Ref Finance v2 concentrated pools and Burrow supply positions. Cross-contract call latency clocked at 840ms with zero frontrunning slippage across NEAR Testnet shards.",
-        wordCount: 168,
-        readingTime: "50s",
-        designPrompt:
-          "Futuristic DeFi holographic terminal displaying real-time liquidity flow between Ref Finance and Burrow, neon cyan and purple fiber-optic cables, dark cyberpunk background, isometric 3D render, octane render 8k --ar 16:9",
-        designStyle: "Isometric Holographic Cyberpunk",
-      },
-    };
-  } else if (isCoffee) {
-    res = {
-      taskId,
-      isLive: false,
-      taskTitle: "Web3 Coffee Launch Campaign & Creative Brand Specs",
-      executionEvents: fallbackEvents,
-      worker1: {
-        deliverableTitle: "Social Community Pulse & Demographic Audit",
-        runtime: "1.08s",
-        sha256: "0x55bc1209e884a210fec881023a19b841",
-        stats: {
-          stat1Label: "Audience Target",
-          stat1Value: "18.5k",
-          stat2Label: "Sentiment",
-          stat2Value: "+91%",
-          stat3Label: "Engagement",
-          stat3Value: "12.4%",
-        },
-        topicClusters: [
-          { tag: "#Web3Coffee", count: 520 },
-          { tag: "#NEARBrews", count: 390 },
-          { tag: "#SpecialtyRoast", count: 245 },
-        ],
-        summary:
-          "Identified strong traction among remote crypto builders for single-origin specialty roast paid via NEAR micro-transactions.",
-      },
-      worker2: {
-        deliverableTitle: "Viral Launch Thread & 4K Hero Banner Specs",
-        runtime: "1.24s",
-        sha256: "0xee7149a0129fbc88310c9215ef882190",
-        filename: "web3_coffee_launch_thread.md",
-        copyHeadline: "☕ PROOF OF ROAST: WEB3 SPECIALTY COFFEE ON NEAR",
-        copyBody:
-          "Coffee meets crypto. Every single-origin Ethiopian roast batch is verified on NEAR with zero-fee micro-transactions. Scan your cup, unlock your digital grower royalties, and savor decentralized specialty beans.",
-        wordCount: 154,
-        readingTime: "45s",
-        designPrompt:
-          "Cinematic commercial photography of a sleek minimalist ceramic coffee cup with glowing cyan steam forming NEAR Protocol logos, morning warm sunlight, rich crema, depth of field, Hasselblad 8k --ar 16:9",
-        designStyle: "Minimalist Commercial Photography",
-      },
-    };
-  } else {
-    res = {
-      taskId,
-      isLive: false,
-      taskTitle: "Real-Time Competitor Alpha Digest & Sentiment Ingestion",
-      executionEvents: fallbackEvents,
-      worker1: {
-        deliverableTitle: "Real-time Social Sentiment Feed",
-        runtime: "1.14s",
-        sha256: "0x98f4c1e34b9d09a888c3f4e156d733b1e9",
-        stats: {
-          stat1Label: "Posts Parsed",
-          stat1Value: "842",
-          stat2Label: "Sentiment",
-          stat2Value: "+78%",
-          stat3Label: "Throughput",
-          stat3Value: "14.2/s",
-        },
-        topicClusters: [
-          { tag: "#AiAgents", count: 412 },
-          { tag: "#NEARProtocol", count: 294 },
-          { tag: "#autonomous_escrow", count: 188 },
-        ],
-        summary:
-          "Sentiment scoring across decentralized agent deployments confirms accelerated adoption of autonomous DAG bounty architectures.",
-      },
-      worker2: {
+  const badDraftBody =
+    "Draft error: missing data. Pipeline interrupted before synthesis.";
+
+  const worker2Result = simulateBadWorker
+    ? {
+        deliverableTitle: "Broken Draft (Failed Specifications)",
+        runtime: "0.22s",
+        sha256: computeOutputHash(badDraftBody),
+        filename: "error_log.txt",
+        copyHeadline: "⚠️ TRUNCATED DRAFT",
+        copyBody: badDraftBody,
+        wordCount: 8,
+        readingTime: "1s",
+        designPrompt: "error",
+        designStyle: "None",
+      }
+    : {
         deliverableTitle: "Executive Alpha Digest & Thread",
         runtime: "1.16s",
         sha256: "0xfa7723ce51a84f3e981bb204cc1948",
         filename: "alpha_thread_output.md",
-        copyHeadline: "⚡ NEAR AUTONOMOUS SWARM INTEL • #892",
+        copyHeadline: "⚡ NEAR AUTONOMOUS AGENT BOUNTY INTEL",
         copyBody:
-          "Live stream analysis indicates a major developer pivot toward dynamic on-chain swarm routing. Sentiment remains at +78% positive following NEAR Testnet launch. Smart contract escrow models show instantaneous sub-second verifications, outperforming legacy oracle pipelines.",
+          "Live stream analysis indicates a major developer pivot toward dynamic on-chain swarm routing. Sentiment remains at +78% positive following NEAR Testnet launch. AgentBounty treasury settlement models show instantaneous sub-second verifications.",
         wordCount: 142,
         readingTime: "45s",
         designPrompt:
           "Cybernetic swarm of glowing autonomous micro-agents trading tokens over a decentralized network graph, deep blue and electric cyan luminescence, futuristic UI HUD overlay, hyperdetailed 8k --ar 16:9",
         designStyle: "Cybernetic HUD Graph Visualization",
-      },
-    };
-  }
+      };
 
   const outputHash = computeOutputHash({
-    worker1: res.worker1,
-    worker2: res.worker2,
+    worker1: worker1Result,
+    worker2: worker2Result,
   });
 
-  return {
-    ...res,
-    outputHash,
+  const verification: { worker1: WorkerVerificationResult; worker2: WorkerVerificationResult } = {
+    worker1: evaluateDeliverable(worker1Result.summary, prompt, "telemetry"),
+    worker2: evaluateDeliverable(worker2Result.copyBody, prompt, "copy"),
   };
+
+  const rulesHash = computeRulesHash();
+
+  return {
+    taskId,
+    outputHash,
+    rulesHash,
+    isLive: false,
+    taskTitle: simulateBadWorker ? "Simulated Malicious Worker Task" : "Autonomous Swarm Bounty Directive",
+    simulateBadWorker,
+    verification,
+    executionEvents: fallbackEvents,
+    worker1: worker1Result,
+    worker2: worker2Result,
+  };
+}
+
+async function finalizeAndPersistDeliverable(params: {
+  taskId: string;
+  effectivePrompt: string;
+  responsePayload: DeliverablesResponse;
+  selectedAgent: SelectedAgentSnapshot;
+  simulateBadWorker: boolean;
+}): Promise<DeliverablesResponse> {
+  const { taskId, effectivePrompt, responsePayload, simulateBadWorker } = params;
+  let agentSnapshot: SelectedAgentSnapshot = { ...params.selectedAgent };
+
+  if (!responsePayload.verification.worker2.passed) {
+    const slashed = await slashAgentReputation(agentSnapshot.id, 5);
+    if (slashed) {
+      agentSnapshot = {
+        ...agentSnapshot,
+        reputationAfter: slashed.reputation,
+        slashed: true,
+      };
+      responsePayload.executionEvents.push({
+        timestamp: new Date().toISOString().substring(11, 23),
+        agent: "ReputationEngine",
+        level: "warn",
+        message: `Reputation slashed for ${agentSnapshot.handle}: ${agentSnapshot.reputationAtSelection ?? "—"} → ${slashed.reputation} (-5 penalty).`,
+      });
+    }
+  }
+
+  responsePayload.selectedAgent = agentSnapshot;
+
+  saveTask({
+    taskId,
+    directivePrompt: effectivePrompt,
+    outputHash: responsePayload.outputHash,
+    rulesHash: responsePayload.rulesHash,
+    createdAt: Date.now(),
+    status: "verified",
+    isLive: responsePayload.isLive,
+    simulateBadWorker,
+    selectedAgent: agentSnapshot,
+    verification: responsePayload.verification,
+    deliverables: {
+      worker1Title: responsePayload.worker1.deliverableTitle,
+      worker1Summary: responsePayload.worker1.summary,
+      worker2Title: responsePayload.worker2.deliverableTitle,
+      worker2Headline: responsePayload.worker2.copyHeadline,
+      worker2Body: responsePayload.worker2.copyBody,
+      worker2DesignPrompt: responsePayload.worker2.designPrompt,
+    },
+    settledWorkers: { worker1: false, worker2: false },
+    executionEvents: responsePayload.executionEvents,
+  });
+
+  return responsePayload;
 }
 
 export async function POST(req: NextRequest) {
   let prompt = "";
+  let simulateBadWorker = false;
+  let requestedAgentId = "";
   try {
     const body = await req.json().catch(() => ({}));
     prompt = body.prompt || "";
+    simulateBadWorker = Boolean(body.simulateBadWorker);
+    requestedAgentId = typeof body.selectedAgentId === "string" ? body.selectedAgentId : "";
   } catch {
     prompt = "";
+    simulateBadWorker = false;
+    requestedAgentId = "";
   }
+
+  const allAgents = await getAgentsWithStats();
+  const requestedAgent = requestedAgentId ? await getAgentById(requestedAgentId) : null;
+  const resolvedAgent =
+    (requestedAgent && requestedAgent.role === "copywriter" ? requestedAgent : null) ??
+    selectPolicyWinner(allAgents) ??
+    allAgents.find((a) => a.role === "copywriter")!;
+
+  const selectedAgentSnapshot: SelectedAgentSnapshot = {
+    id: resolvedAgent.id,
+    name: resolvedAgent.name,
+    handle: resolvedAgent.handle,
+    bidPrice: resolvedAgent.bidPrice,
+    bidNear: resolvedAgent.bidNear,
+    reputationAtSelection: resolvedAgent.reputation,
+  };
+  const worker2Tag = shortHandle(resolvedAgent.handle);
 
   const taskId = generateTaskId();
   const startTime = Date.now();
@@ -237,20 +314,26 @@ export async function POST(req: NextRequest) {
 
   const apiKey = process.env.GEMINI_API_KEY;
 
-  if (!apiKey || !prompt || prompt.trim().length === 0) {
-    const fallback = getFallbackDeliverables(prompt || "Default Objective", taskId);
-    // Register verified task in server store for Treasury gate
-    getTaskStore().set(taskId, {
+  const effectivePrompt =
+    prompt && prompt.trim().length > 0
+      ? prompt.trim()
+      : "Autonomous AI Agent Swarm coordinating decentralized intelligence, market sentiment analysis, and NEAR Testnet micro-settlements";
+
+  if (!apiKey) {
+    const fallback = getFallbackDeliverables(
+      effectivePrompt,
       taskId,
-      directivePrompt: prompt || "Default Objective",
-      outputHash: fallback.outputHash,
-      createdAt: Date.now(),
-      status: "verified",
-      isLive: false,
-      settledWorkers: { worker1: false, worker2: false },
-      executionEvents: fallback.executionEvents,
+      simulateBadWorker,
+      selectedAgentSnapshot,
+    );
+    const finalized = await finalizeAndPersistDeliverable({
+      taskId,
+      effectivePrompt,
+      responsePayload: fallback,
+      selectedAgent: selectedAgentSnapshot,
+      simulateBadWorker,
     });
-    return NextResponse.json(fallback);
+    return NextResponse.json(finalized);
   }
 
   try {
@@ -261,59 +344,54 @@ export async function POST(req: NextRequest) {
       timestamp: getTimestamp(),
       agent: "Orchestrator",
       level: "step",
-      message: `DAG Initialized for ${taskId}. Spawning parallel worker nodes.`,
+      message: `DAG Initialized for Task ${taskId}. Bidding closed: @scout-worker (0.03 NEAR) and ${worker2Tag} (${resolvedAgent.bidPrice}) assigned.`,
     });
 
     events.push({
       timestamp: getTimestamp(),
       agent: "Orchestrator",
       level: "info",
-      message: `Dispatched sub-tasks: Worker 1 (@scout-worker) and Worker 2 (@copy-agent).`,
+      message: `Dispatched parallel sub-tasks to worker nodes.`,
     });
 
-    // Milestone 3: Split into two separate Gemini calls with different specialized prompts!
+    // Worker 1: Scout
     const worker1Promise = (async () => {
       const t0 = Date.now();
       events.push({
         timestamp: getTimestamp(),
         agent: "@scout-worker",
         level: "info",
-        message: "Initiated data parsing & telemetry extraction via Gemini Flash 2.5...",
+        message: "Initiated telemetry extraction via Gemini Flash...",
       });
 
-      const worker1SystemPrompt = `You are @scout-worker.testnet, an autonomous data extraction and research agent in the SwarmPay network on NEAR.
+      const worker1SystemPrompt = `You are @scout-worker.testnet, an autonomous data extraction and telemetry research agent in the AgentBounty network on NEAR.
 Analyze this user bounty directive:
-"${prompt}"
+"${effectivePrompt}"
 
-Produce structured research telemetry in valid JSON matching this schema:
+Generate dynamically synthesized research data, metrics, and topic clusters tailored directly to this directive.
+Return valid JSON matching this schema:
 {
-  "deliverableTitle": "Specific deliverable name (e.g. 'Social Sentiment Matrix' or 'Cross-DEX Arbitrage Scan')",
+  "deliverableTitle": "Specific deliverable title (e.g. 'Social Sentiment Matrix' or 'Cross-Market Arbitrage Feed')",
   "stats": {
-    "stat1Label": "Label like 'Records Scanned' or 'Posts Parsed'",
-    "stat1Value": "Number string like '940'",
-    "stat2Label": "Label like 'Confidence' or 'Sentiment'",
-    "stat2Value": "Percentage string like '+84%'",
-    "stat3Label": "Label like 'Throughput' or 'Latency'",
-    "stat3Value": "Rate string like '18.4/s' or '45ms'"
+    "stat1Label": "Relevant metric label (e.g. 'Posts Analyzed', 'Contracts Scanned', 'Orders Parsed')",
+    "stat1Value": "Number or percentage string (e.g. '1,420', '842', '98.4%')",
+    "stat2Label": "Relevant metric label (e.g. 'Sentiment Index', 'Confidence Score', 'Spread Delta')",
+    "stat2Value": "Value string (e.g. '+82%', '99.1%', '4.2 bps')",
+    "stat3Label": "Throughput or latency label (e.g. 'Throughput', 'Processing Rate', 'Latency')",
+    "stat3Value": "Value string (e.g. '18.4/s', '45ms', '12.8 TGas')"
   },
   "topicClusters": [
-    { "tag": "#Keyword1", "count": 420 },
-    { "tag": "#Keyword2", "count": 280 },
-    { "tag": "#Keyword3", "count": 165 }
+    { "tag": "#RelevantTag1", "count": 420 },
+    { "tag": "#RelevantTag2", "count": 280 },
+    { "tag": "#RelevantTag3", "count": 165 }
   ],
-  "summary": "1-2 sentence executive technical findings summary."
+  "summary": "1-2 sentence executive technical findings summary tailored specifically to this directive."
 }
 Respond ONLY with valid JSON.`;
 
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: worker1SystemPrompt,
-        config: { responseMimeType: "application/json" },
-      });
-
+      const rawJson = await generateWithGeminiModels(ai, worker1SystemPrompt);
       const elapsed = ((Date.now() - t0) / 1000).toFixed(2);
-      const text = response.text?.trim() || "";
-      const cleaned = text.replace(/^```json\s*/, "").replace(/\s*```$/, "");
+      const cleaned = cleanJsonString(rawJson);
       const parsed = JSON.parse(cleaned);
       const sha256 = computeOutputHash(parsed);
 
@@ -339,54 +417,77 @@ Respond ONLY with valid JSON.`;
         topicClusters: parsed.topicClusters || [
           { tag: "#NearSwarm", count: 320 },
           { tag: "#AutonomousAI", count: 210 },
-          { tag: "#MicroBounty", count: 145 },
+          { tag: "#AgentBounty", count: 145 },
         ],
         summary: parsed.summary || "Data feed verified and signed.",
       };
     })();
 
+    // Worker 2: Copy & Creative Spec (or bad worker simulation)
     const worker2Promise = (async () => {
       const t0 = Date.now();
+
+      if (simulateBadWorker) {
+        events.push({
+          timestamp: getTimestamp(),
+          agent: worker2Tag,
+          level: "warn",
+          message: "Simulation mode active: Worker deliverable broken/truncated without required length or prompt keywords...",
+        });
+
+        const badDraftBody =
+          "Draft error: missing data. Pipeline interrupted before synthesis.";
+        const sha256 = computeOutputHash(badDraftBody);
+        return {
+          taskTitle: "Truncated Output Demo",
+          deliverableTitle: "Broken Draft (Failed Specifications)",
+          runtime: "0.24s",
+          sha256,
+          filename: "malformed_output.txt",
+          copyHeadline: "⚠️ RUNTIME ERROR / TRUNCATED DRAFT",
+          copyBody: badDraftBody,
+          wordCount: 8,
+          readingTime: "1s",
+          designPrompt: "error",
+          designStyle: "Undefined",
+        };
+      }
+
       events.push({
         timestamp: getTimestamp(),
-        agent: "@copy-agent",
+        agent: worker2Tag,
         level: "info",
-        message: "Initiated synthesis, copywriting, and 4K prompt generation via Gemini Flash 2.5...",
+        message: "Initiated synthesis, copywriting, and 4K prompt generation via Gemini Flash...",
       });
 
-      const worker2SystemPrompt = `You are @copy-agent.testnet, an autonomous synthesis and creative agent in the SwarmPay network on NEAR.
+      const worker2SystemPrompt = `You are ${resolvedAgent.handle}, an autonomous synthesis and creative agent (${resolvedAgent.specialty}) in the AgentBounty network on NEAR.
 Given this user directive:
-"${prompt}"
+"${effectivePrompt}"
 
-Produce real marketing copy and a professional 4K visual generation prompt in valid JSON matching this schema:
+Generate marketing/synthesis copy and an image generation prompt directly based on this directive.
+Return valid JSON matching this schema:
 {
-  "taskTitle": "Short bounty headline (max 7 words)",
+  "taskTitle": "Punchy bounty headline (max 7 words)",
   "deliverableTitle": "Title of deliverable (e.g. 'Launch Campaign & 4K Hero Banner Specs')",
-  "filename": "Filename string (e.g. 'launch_thread.md')",
-  "copyHeadline": "Punchy headline with emoji (e.g. '⚡ NEAR SWARM ANNOUNCEMENT')",
-  "copyBody": "High-quality, polished 2-3 paragraph marketing copy or thread fulfilling the directive.",
+  "filename": "Filename string (e.g. 'launch_announcement.md')",
+  "copyHeadline": "Punchy headline with emoji (e.g. '⚡ AGENTBOUNTY INTEL')",
+  "copyBody": "High-quality, polished 2-3 paragraph markdown copy or announcement fulfilling this directive with specific domain references.",
   "wordCount": 160,
   "readingTime": "45s",
-  "designPrompt": "A detailed, professional Midjourney v6.1 / Flux 4K visual generation prompt with lighting, atmosphere, style and --ar 16:9 flag tailored specifically to this bounty.",
-  "designStyle": "Art/visual style name (e.g. 'Cybernetic Futuristic Hologram 8K')"
+  "designPrompt": "A detailed, professional Midjourney v6.1 / Flux 4K visual generation prompt with cinematic lighting, style, composition and --ar 16:9 flag tailored specifically to this directive.",
+  "designStyle": "Art/visual style name (e.g. 'Cybernetic Holographic HUD 8K')"
 }
 Respond ONLY with valid JSON.`;
 
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: worker2SystemPrompt,
-        config: { responseMimeType: "application/json" },
-      });
-
+      const rawJson = await generateWithGeminiModels(ai, worker2SystemPrompt);
       const elapsed = ((Date.now() - t0) / 1000).toFixed(2);
-      const text = response.text?.trim() || "";
-      const cleaned = text.replace(/^```json\s*/, "").replace(/\s*```$/, "");
+      const cleaned = cleanJsonString(rawJson);
       const parsed = JSON.parse(cleaned);
       const sha256 = computeOutputHash(parsed);
 
       events.push({
         timestamp: getTimestamp(),
-        agent: "@copy-agent",
+        agent: worker2Tag,
         level: "success",
         message: `Synthesis complete in ${elapsed}s (${parsed.wordCount || 150} words). Design prompt ready.`,
       });
@@ -397,7 +498,7 @@ Respond ONLY with valid JSON.`;
         runtime: `${elapsed}s`,
         sha256,
         filename: parsed.filename || "swarm_output.md",
-        copyHeadline: parsed.copyHeadline || "⚡ SWARMPAY VERIFIED DELIVERABLE",
+        copyHeadline: parsed.copyHeadline || "⚡ AGENTBOUNTY DELIVERABLE",
         copyBody: parsed.copyBody || "Synthesized deliverable generated by autonomous agent.",
         wordCount: parsed.wordCount || 140,
         readingTime: parsed.readingTime || "40s",
@@ -406,7 +507,6 @@ Respond ONLY with valid JSON.`;
       };
     })();
 
-    // Run both worker agents in true parallel swarm execution
     const [worker1Result, worker2Result] = await Promise.all([
       worker1Promise,
       worker2Promise,
@@ -414,7 +514,40 @@ Respond ONLY with valid JSON.`;
 
     const totalElapsed = ((Date.now() - startTime) / 1000).toFixed(2);
 
-    // Cryptographic proof hash of the combined swarm outputs
+    // ── Milestone 3: Deterministic Rule-Based Automated Verifier Gate ───────
+    const worker1Verification = evaluateDeliverable(
+      worker1Result.summary,
+      effectivePrompt,
+      "telemetry",
+    );
+
+    const worker2Verification = evaluateDeliverable(
+      worker2Result.copyBody,
+      effectivePrompt,
+      "copy",
+    );
+
+    const verification: { worker1: WorkerVerificationResult; worker2: WorkerVerificationResult } = {
+      worker1: worker1Verification,
+      worker2: worker2Verification,
+    };
+
+    if (worker2Verification.passed) {
+      events.push({
+        timestamp: getTimestamp(),
+        agent: "VerifierGate",
+        level: "success",
+        message: `Automated Verifier Gate: Both deliverables PASSED specifications. Worker 1 Score: ${worker1Verification.score}%, Worker 2 Score: ${worker2Verification.score}%. Approved for settlement.`,
+      });
+    } else {
+      events.push({
+        timestamp: getTimestamp(),
+        agent: "VerifierGate",
+        level: "warn",
+        message: `Automated Verifier Gate: Worker 2 REJECTED (${worker2Verification.reason}). Settlement BLOCKED. Funds kept in manager treasury.`,
+      });
+    }
+
     const outputHash = computeOutputHash({
       worker1: worker1Result,
       worker2: {
@@ -427,55 +560,50 @@ Respond ONLY with valid JSON.`;
       timestamp: getTimestamp(),
       agent: "Orchestrator",
       level: "step",
-      message: `DAG convergence achieved in ${totalElapsed}s. Root SHA-256 Proof: ${outputHash.slice(0, 16)}...`,
-    });
-
-    events.push({
-      timestamp: getTimestamp(),
-      agent: "Orchestrator",
-      level: "success",
-      message: `Task ${taskId} verified and locked in Agent Treasury Engine. Ready for payout release.`,
+      message: `Convergence achieved in ${totalElapsed}s. Root SHA-256 Proof: ${outputHash.slice(0, 16)}...`,
     });
 
     const responsePayload: DeliverablesResponse = {
       taskId,
       outputHash,
+      rulesHash: computeRulesHash(),
       isLive: true,
       taskTitle: worker2Result.taskTitle,
+      simulateBadWorker,
+      selectedAgent: selectedAgentSnapshot,
+      verification,
       executionEvents: events,
       worker1: worker1Result,
       worker2: worker2Result,
     };
 
-    // Store verified task in server-side gate
-    getTaskStore().set(taskId, {
+    const finalized = await finalizeAndPersistDeliverable({
       taskId,
-      directivePrompt: prompt,
-      outputHash,
-      createdAt: Date.now(),
-      status: "verified",
-      isLive: true,
-      settledWorkers: { worker1: false, worker2: false },
-      executionEvents: events,
+      effectivePrompt,
+      responsePayload,
+      selectedAgent: selectedAgentSnapshot,
+      simulateBadWorker,
     });
 
-    return NextResponse.json(responsePayload);
+    return NextResponse.json(finalized);
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Gemini call failed";
     console.warn("Gemini call failed, using fallback:", message);
 
-    const fallback = getFallbackDeliverables(prompt, taskId);
-    getTaskStore().set(taskId, {
+    const fallback = getFallbackDeliverables(
+      effectivePrompt,
       taskId,
-      directivePrompt: prompt,
-      outputHash: fallback.outputHash,
-      createdAt: Date.now(),
-      status: "verified",
-      isLive: false,
-      settledWorkers: { worker1: false, worker2: false },
-      executionEvents: fallback.executionEvents,
+      simulateBadWorker,
+      selectedAgentSnapshot,
+    );
+    const finalized = await finalizeAndPersistDeliverable({
+      taskId,
+      effectivePrompt,
+      responsePayload: fallback,
+      selectedAgent: selectedAgentSnapshot,
+      simulateBadWorker,
     });
 
-    return NextResponse.json(fallback);
+    return NextResponse.json(finalized);
   }
 }

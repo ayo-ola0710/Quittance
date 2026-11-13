@@ -57,3 +57,37 @@ export interface ShortcutItem {
   href: string;
   accent: "primary" | "secondary" | "tertiary" | "surface";
 }
+
+export interface VerificationRuleDef {
+  id: string;
+  name: string;
+  description: string;
+  threshold: string;
+}
+
+export const VERIFICATION_RULES: VerificationRuleDef[] = [
+  {
+    id: "min-length",
+    name: "Minimum Content Length",
+    description: "Output must exceed minimum character count threshold (> 120 chars for synthesis, > 80 chars for research)",
+    threshold: "> 120 chars (synthesis) / > 80 chars (research)",
+  },
+  {
+    id: "prompt-keywords",
+    name: "Prompt Keyword Match",
+    description: "Deliverable must contain salient thematic keywords from the user bounty directive",
+    threshold: "Salient keyword match",
+  },
+  {
+    id: "structured-sections",
+    name: "Structured Markdown / Sections",
+    description: "Deliverable must contain structured Markdown formatting, headings, or metric key-values",
+    threshold: "Headings, line breaks, or key-values",
+  },
+  {
+    id: "complete-deliverable",
+    name: "Complete Deliverable",
+    description: "Output must be complete without placeholder error tokens, truncated data, or syntax crash markers",
+    threshold: "No error:, incomplete, or corrupted draft tokens",
+  },
+];

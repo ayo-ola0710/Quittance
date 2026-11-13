@@ -26,7 +26,7 @@ export function FilterBar({
   onFilterChange,
   selectedSort = "Sort: Most Recent",
   onSortChange,
-  counts = { all: 34, active: 2, completed: 28, drafts: 4 },
+  counts = { all: 0, active: 0, completed: 0, drafts: 0 },
 }: FilterBarProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -42,12 +42,17 @@ export function FilterBar({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  const filterTabs: { id: FilterCategory; label: string; count: number; hasPulse?: boolean }[] = [
+  const allTabs: { id: FilterCategory; label: string; count: number; hasPulse?: boolean }[] = [
     { id: "all", label: "All", count: counts.all },
     { id: "active", label: "Active", count: counts.active, hasPulse: true },
     { id: "completed", label: "Completed", count: counts.completed },
     { id: "drafts", label: "Drafts", count: counts.drafts },
   ];
+
+  // Only show Active/Drafts tabs when there actually are items in those states
+  const filterTabs = allTabs.filter(
+    (tab) => tab.id === "all" || tab.id === "completed" || tab.count > 0 || selectedFilter === tab.id,
+  );
 
   return (
     <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-space-sm pt-space-xs">
@@ -62,7 +67,7 @@ export function FilterBar({
           id="taskSearchInput"
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          placeholder="Search by Task Title, ID (#BNT-...), or Assigned Agent..."
+          placeholder="Search tasks by title, ID, or agent..."
           className="w-full bg-surface-container-lowest text-on-surface font-label-mono-md pl-10 pr-16 py-2.5 rounded-xl shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] placeholder:text-outline focus:outline-none focus:ring-1 focus:ring-primary"
         />
         <span className="absolute right-3 top-1/2 -translate-y-1/2 font-label-mono-xs text-on-surface-variant bg-surface-container-high px-1.5 py-0.5 rounded pointer-events-none">
