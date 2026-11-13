@@ -6,6 +6,7 @@ export interface MarketplaceAgent {
   id: string;
   name: string;
   handle: string;
+  payoutAccount?: string;
   avatar: string;
   bidPrice: string;
   bidNear: number;
@@ -35,18 +36,25 @@ const AGENT_STATS_PATH = path.join(
   "agent-stats.json",
 );
 
+const scoutHandle = process.env.WORKER_SCOUT_ACCOUNT_ID
+  ? (process.env.WORKER_SCOUT_ACCOUNT_ID.startsWith("@")
+      ? process.env.WORKER_SCOUT_ACCOUNT_ID
+      : `@${process.env.WORKER_SCOUT_ACCOUNT_ID}`)
+  : "@isreel-design.testnet";
+
 const SCRAPE_SCOUT_AGENT: Omit<
   MarketplaceAgent,
   "baseReputation" | "completedTasks" | "slashedCount"
 > = {
   id: "scrape-scout",
   name: "ScrapeScout v3.0",
-  handle: "@scout-worker.testnet",
-  avatar: "",
+  handle: scoutHandle,
+  payoutAccount: process.env.WORKER_SCOUT_ACCOUNT_ID || "isreel-design.testnet",
+  avatar: "/avatars/scrape-scout.svg",
   bidPrice: "0.03 NEAR",
   bidNear: 0.03,
   reputation: 99,
-  sla: "99.7% (248 tasks)",
+  sla: "Starting fixture (248 tasks)",
   latency: "0.84s",
   specialty: "Web Intelligence & Sentiment Extraction",
   role: "scout",
@@ -84,14 +92,18 @@ async function readStatsMap(): Promise<AgentStatsMap> {
 }
 
 async function writeStatsMap(stats: AgentStatsMap): Promise<void> {
-  await ensureStatsFileExists();
-  const tmpPath = `${AGENT_STATS_PATH}.tmp`;
-  await fs.promises.writeFile(
-    tmpPath,
-    JSON.stringify(stats, null, 2),
-    "utf-8",
-  );
-  await fs.promises.rename(tmpPath, AGENT_STATS_PATH);
+  try {
+    await ensureStatsFileExists();
+    const tmpPath = `${AGENT_STATS_PATH}.tmp`;
+    await fs.promises.writeFile(
+      tmpPath,
+      JSON.stringify(stats, null, 2),
+      "utf-8",
+    );
+    await fs.promises.rename(tmpPath, AGENT_STATS_PATH);
+  } catch (err) {
+    console.warn("Could not write agent stats to disk:", err);
+  }
 }
 
 /**

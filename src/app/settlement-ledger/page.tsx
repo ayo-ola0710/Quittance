@@ -156,7 +156,7 @@ export default function SettlementLedgerPage() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [managerAccount, setManagerAccount] = useState<string>(
-    "agentbounty-treasury.testnet",
+    "quittance-treasury.testnet",
   );
 
   useEffect(() => {
@@ -341,7 +341,7 @@ export default function SettlementLedgerPage() {
                 </h1>
                 <p className="font-body-md text-on-surface-variant max-w-2xl">
                   Real-time audit log of every verified NEAR Testnet transfer and
-                  Verifier-Gate block dispatched by the AgentBounty treasury.
+                  Verifier-Gate block dispatched by the Quittance treasury.
                 </p>
               </div>
 
@@ -769,7 +769,7 @@ export default function SettlementLedgerPage() {
                     </span>
                   </div>
                   <p className="font-body-sm text-on-surface-variant">
-                    Every payout is gated by AgentBounty&apos;s deterministic quality
+                    Every payout is gated by Quittance&apos;s deterministic quality
                     checks before signing a direct NEAR Testnet transfer via{" "}
                     <code className="text-primary">near-api-js</code>. Rejected outputs
                     disburse 0 NEAR and trigger automatic reputation slashing.

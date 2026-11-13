@@ -17,7 +17,7 @@ export function Pagination({
   endItem = 1,
   totalItems = 0,
   onPageChange,
-  contractAddress = "agentbounty-treasury.testnet",
+  contractAddress = "quittance-treasury.testnet",
 }: PaginationProps) {
   if (totalPages <= 1) {
     return null;
@@ -26,13 +26,13 @@ export function Pagination({
   const pages = Array.from({ length: totalPages }, (_, idx) => idx + 1);
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-space-md pt-space-md pb-space-xl text-on-surface-variant font-label-mono-xs">
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-space-md pt-space-md pb-space-xl text-on-surface-variant font-body-sm text-xs tabular-nums">
       {/* Items Range Info */}
-      <div className="flex items-center gap-space-xs">
+      <div className="flex items-center gap-1">
         <span>
           Showing{" "}
           <strong className="text-on-surface">
-            {startItem} - {endItem}
+            {startItem} &ndash; {endItem}
           </strong>{" "}
           of <strong className="text-on-surface">{totalItems}</strong> tasks
         </span>
@@ -44,7 +44,7 @@ export function Pagination({
           type="button"
           onClick={() => onPageChange?.(currentPage - 1)}
           disabled={currentPage <= 1}
-          className="px-2.5 py-1.5 rounded-lg bg-surface-container-high text-on-surface-variant hover:text-on-surface hover:bg-surface-bright transition-all disabled:opacity-40 disabled:pointer-events-none cursor-pointer"
+          className="px-2 py-1 rounded-[2px] bg-surface text-on-surface-variant hover:text-on-surface hover:bg-surface-container border border-outline transition-colors disabled:opacity-40 disabled:pointer-events-none cursor-pointer"
         >
           <span className="material-symbols-outlined text-[16px]">chevron_left</span>
         </button>
@@ -54,10 +54,10 @@ export function Pagination({
             key={page}
             type="button"
             onClick={() => onPageChange?.(page)}
-            className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all cursor-pointer ${
+            className={`w-7 h-7 rounded-[2px] flex items-center justify-center transition-colors border cursor-pointer ${
               page === currentPage
-                ? "bg-primary-container text-on-primary font-bold"
-                : "bg-surface-container-high hover:bg-surface-bright text-on-surface"
+                ? "bg-primary text-on-primary border-primary font-semibold"
+                : "bg-surface hover:bg-surface-container text-on-surface border-outline"
             }`}
           >
             {page}
@@ -68,7 +68,7 @@ export function Pagination({
           type="button"
           onClick={() => onPageChange?.(currentPage + 1)}
           disabled={currentPage >= totalPages}
-          className="px-2.5 py-1.5 rounded-lg bg-surface-container-high text-on-surface-variant hover:text-on-surface hover:bg-surface-bright transition-all disabled:opacity-40 disabled:pointer-events-none cursor-pointer"
+          className="px-2 py-1 rounded-[2px] bg-surface text-on-surface-variant hover:text-on-surface hover:bg-surface-container border border-outline transition-colors disabled:opacity-40 disabled:pointer-events-none cursor-pointer"
         >
           <span className="material-symbols-outlined text-[16px]">chevron_right</span>
         </button>
@@ -80,7 +80,7 @@ export function Pagination({
           verified_user
         </span>
         <span>
-          Payer wallet: <code className="text-primary font-mono">{contractAddress}</code>
+          Payer wallet: <code className="text-on-surface font-mono">{contractAddress}</code>
         </span>
       </div>
     </div>

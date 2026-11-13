@@ -21,6 +21,7 @@ interface WorkerVerificationResult {
 interface DeliverablesData {
   taskId: string;
   outputHash: string;
+  rulesHash?: string;
   isLive: boolean;
   taskTitle: string;
   simulateBadWorker?: boolean;
@@ -96,7 +97,7 @@ export function DynamicStepSettlement({
   const [activeWorker2Tab, setActiveWorker2Tab] = useState<"copy" | "design">("copy");
   const [simulateCheatMode, setSimulateCheatMode] = useState(false);
   const [showTechDrawer, setShowTechDrawer] = useState(false);
-  const [managerAccount, setManagerAccount] = useState("agentbounty-treasury.testnet");
+  const [managerAccount, setManagerAccount] = useState("quittance-treasury.testnet");
 
   useEffect(() => {
     fetch("/api/account")
@@ -423,17 +424,17 @@ export function DynamicStepSettlement({
                 </div>
               </div>
               {isLoadingDeliverables ? (
-                <span className="px-2 py-0.5 rounded-full text-[11px] font-mono bg-surface-container-high text-on-surface-variant">
-                  Checking...
+                <span className="px-2 py-0.5 rounded-[2px] font-label-mono-xs bg-surface-container text-on-surface-variant">
+                  Inspecting...
                 </span>
+              ) : worker1Settled ? (
+                <span className="stamp-paid animate-stamp-paid">PAID</span>
               ) : worker1Passed ? (
-                <span className="px-2 py-0.5 rounded-full text-[11px] font-mono font-semibold bg-tertiary/15 text-tertiary border border-tertiary/30">
-                  PASSED ({worker1Score}/100)
+                <span className="px-2 py-0.5 rounded-[2px] font-label-mono-xs font-semibold bg-tertiary-container text-on-tertiary-container border border-tertiary/40">
+                  PASSED ({worker1Score}%)
                 </span>
               ) : (
-                <span className="px-2 py-0.5 rounded-full text-[11px] font-mono font-bold bg-red-500/20 text-red-400 border border-red-500/40">
-                  REJECTED ({worker1Score}/100)
-                </span>
+                <span className="stamp-rejected animate-stamp-rejected">REJECTED</span>
               )}
             </div>
 
@@ -505,7 +506,7 @@ export function DynamicStepSettlement({
                 {(deliverables?.worker1.topicClusters || [
                   { tag: "#AiAgents", count: 412 },
                   { tag: "#NEARProtocol", count: 294 },
-                  { tag: "#AgentBounty", count: 188 },
+                  { tag: "#Quittance", count: 188 },
                 ]).map((cluster, i) => (
                   <span
                     key={i}
@@ -589,18 +590,23 @@ export function DynamicStepSettlement({
 
               {/* Verifier Badge */}
               {isLoadingDeliverables ? (
-                <span className="px-2 py-0.5 rounded-full text-[11px] font-mono bg-surface-container-high text-on-surface-variant">
-                  Checking...
+                <span className="px-2 py-0.5 rounded-[2px] font-label-mono-xs bg-surface-container text-on-surface-variant">
+                  Inspecting...
                 </span>
+              ) : worker2Settled ? (
+                <div className="flex items-center gap-1.5">
+                  <span className="stamp-paid animate-stamp-paid">PAID</span>
+                  <span className="font-label-mono-xs text-tertiary font-semibold">+1 rep</span>
+                </div>
               ) : worker2Passed ? (
-                <span className="px-2 py-0.5 rounded-full text-[11px] font-mono font-semibold bg-tertiary/15 text-tertiary border border-tertiary/30">
-                  PASSED ({worker2Score}/100)
+                <span className="px-2 py-0.5 rounded-[2px] font-label-mono-xs font-semibold bg-tertiary-container text-on-tertiary-container border border-tertiary/40">
+                  PASSED ({worker2Score}%)
                 </span>
               ) : (
-                <span className="px-2 py-0.5 rounded-full text-[11px] font-mono font-bold bg-red-500/20 text-red-400 border border-red-500/40 flex items-center gap-1">
-                  <span className="material-symbols-outlined text-[13px]">cancel</span>
-                  REJECTED ({worker2Score}/100)
-                </span>
+                <div className="flex items-center gap-1.5">
+                  <span className="stamp-rejected animate-stamp-rejected">REJECTED</span>
+                  <span className="font-label-mono-xs text-error font-semibold">-5 rep</span>
+                </div>
               )}
             </div>
 
@@ -921,6 +927,22 @@ export function DynamicStepSettlement({
               </div>
 
               <div className="flex items-center justify-between p-2 rounded bg-surface-container-low">
+                <span className="text-outline">Committed Rules Hash:</span>
+                <div className="flex items-center gap-1 text-tertiary">
+                  <span>{deliverables?.rulesHash ? `${deliverables.rulesHash.slice(0, 14)}...` : "0xLocked"}</span>
+                  {deliverables?.rulesHash && (
+                    <button
+                      type="button"
+                      onClick={() => handleCopy(deliverables.rulesHash!, "rules hash")}
+                      className="hover:text-on-surface p-0.5"
+                    >
+                      <span className="material-symbols-outlined text-[13px]">content_copy</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between p-2 rounded bg-surface-container-low md:col-span-2">
                 <span className="text-outline">Anti-Double-Pay Guard:</span>
                 <span className="text-tertiary font-semibold">Active &amp; Enforced</span>
               </div>

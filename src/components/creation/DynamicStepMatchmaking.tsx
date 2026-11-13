@@ -54,7 +54,7 @@ export function DynamicStepMatchmaking({
   const [selectedWriterId, setSelectedWriterId] = useState("copy-agent");
   const [policyWinnerId, setPolicyWinnerId] = useState<string>("copy-agent");
   const [isLocking, setIsLocking] = useState(false);
-  const [managerAccount, setManagerAccount] = useState("agentbounty-treasury.testnet");
+  const [managerAccount, setManagerAccount] = useState("quittance-treasury.testnet");
 
   useEffect(() => {
     fetch("/api/account")
@@ -363,6 +363,52 @@ export function DynamicStepMatchmaking({
               })}
             </div>
           </div>
+
+          {/* Sub-Task 3: Committed Verification Checks */}
+          <div className="p-5 rounded-2xl bg-surface-container-low border border-surface-container-high/50 space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 pb-2 border-b border-surface-container-high/40">
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-tertiary text-[20px]">
+                  verified_user
+                </span>
+                <div>
+                  <h3 className="text-base font-bold text-on-surface">
+                    Committed Verification Checks
+                  </h3>
+                  <p className="text-[11px] font-mono text-outline">
+                    Must pass to unlock payout • Rules hash recorded before execution
+                  </p>
+                </div>
+              </div>
+              <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-tertiary/15 text-tertiary border border-tertiary/25 self-start sm:self-auto">
+                4 Automated Rules
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+              {VERIFICATION_RULES.map((rule, idx) => (
+                <div
+                  key={rule.id || idx}
+                  className="p-3 rounded-xl bg-surface-container border border-surface-container-high/30 flex items-start gap-2.5 font-mono text-xs"
+                >
+                  <span className="w-5 h-5 rounded-full bg-primary/15 text-primary flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5">
+                    {idx + 1}
+                  </span>
+                  <div className="space-y-1 min-w-0">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="font-semibold text-on-surface text-xs">{rule.name}</span>
+                      <span className="text-[10px] text-tertiary bg-tertiary/10 px-1.5 py-0.2 rounded border border-tertiary/20">
+                        {rule.threshold}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-on-surface-variant leading-relaxed">
+                      {rule.description}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Right 4 Cols: Treasury Dispatch Summary */}
@@ -382,6 +428,10 @@ export function DynamicStepMatchmaking({
             <div className="flex items-center justify-between">
               <span className="text-outline">Writing Agent ({selectedCandidate.name}):</span>
               <span className="text-on-surface font-semibold">{selectedCandidate.bidPrice}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-outline">Verification Gate:</span>
+              <span className="text-tertiary font-semibold">4 Rules Committed</span>
             </div>
             <div className="flex items-center justify-between pt-2 border-t border-surface-container-high/30">
               <span className="text-outline">NEAR Network Fee:</span>

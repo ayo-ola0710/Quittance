@@ -114,8 +114,8 @@ function LiveExecutionModalInner({
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
               </span>
-              <span className="font-label-mono-xs text-primary uppercase tracking-wider font-semibold">
-                LIVE · Agent Swarm Execution
+              <span className="font-label-mono-xs text-primary font-semibold">
+                Sample log (Playback fixture)
               </span>
               <span className="font-label-mono-xs text-outline">•</span>
               <span className="font-label-mono-sm text-on-surface font-medium">{task.id}</span>

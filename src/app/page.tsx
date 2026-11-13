@@ -126,7 +126,7 @@ export default function Home() {
   const [currentPage, setCurrentPage] = useState(1);
   const [tasks, setTasks] = useState<TaskItem[]>(initialTasks);
   const [walletBalance, setWalletBalance] = useState<string>("Checking...");
-  const [managerAccount, setManagerAccount] = useState<string>("agentbounty-treasury.testnet");
+  const [managerAccount, setManagerAccount] = useState<string>("quittance-treasury.testnet");
   const [selectedTaskForModal, setSelectedTaskForModal] =
     useState<TaskItem | null>(null);
   const [liveExecutionTask, setLiveExecutionTask] =

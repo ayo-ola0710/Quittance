@@ -39,7 +39,7 @@ export function DeliverablesModal({
               <span className="material-symbols-outlined text-[12px]">
                 verified
               </span>
-              <span>Delivered &amp; Cryptographically Verified</span>
+              <span>Delivered and verified</span>
             </span>
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-label-mono-xs font-medium tracking-wide bg-surface-container-high text-on-surface-variant">
               {task.category}
@@ -164,14 +164,14 @@ export function DeliverablesModal({
                     <div className="p-3 rounded-lg bg-surface-container-lowest border border-surface-container-high/60">
                       <span className="text-primary font-semibold">4/8</span> 🎨
                       Experience the full campaign visual suite and claim your
-                      genesis sampler at coffee.agentbounty.testnet! 🚀
+                      genesis sampler at coffee.quittance.testnet! 🚀
                     </div>
                   </div>
                 </div>
               ) : (
-                <div className="flex flex-col items-center justify-center p-space-lg rounded-xl bg-surface-container border border-surface-container-high text-center gap-4">
-                  <div className="w-20 h-20 rounded-2xl bg-primary-container/20 flex items-center justify-center text-primary">
-                    <span className="material-symbols-outlined text-[48px]">
+                <div className="flex flex-col items-center justify-center p-space-lg rounded-[2px] bg-surface-container border border-outline text-center gap-4">
+                  <div className="w-16 h-16 rounded-[2px] bg-surface border border-outline flex items-center justify-center text-primary">
+                    <span className="material-symbols-outlined text-[36px]">
                       image
                     </span>
                   </div>
@@ -180,18 +180,17 @@ export function DeliverablesModal({
                       Flux_4K_Coffee_Hero.png
                     </h3>
                     <p className="font-label-mono-xs text-on-surface-variant mt-1">
-                      Render Spec: 3840x2160 • Prompt: &quot;Cyberpunk coffee
-                      roastery on Mars, neon cyan glow, volumetric smoke,
-                      photorealistic 8k&quot;
+                      Render Spec: 3840x2160 &bull; Prompt: &quot;Cyberpunk coffee
+                      roastery on Mars, photorealistic 8k&quot;
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-label-mono-xs font-medium tracking-wide bg-tertiary/10 text-tertiary">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[2px] font-label-mono-xs font-medium tracking-wide bg-tertiary-container text-on-tertiary-container border border-tertiary/30">
                       SHA-256 Verified: c94b...e01f
                     </span>
                     <button
                       type="button"
-                      className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary hover:bg-primary-container active:scale-95 text-on-primary font-body-sm font-semibold shadow-[0_0_24px_-4px_rgba(6,182,212,0.4)] transition-all duration-150 text-[12px] cursor-pointer"
+                      className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-[2px] bg-primary hover:bg-primary/90 text-on-primary font-body-sm font-semibold transition-colors text-[12px] cursor-pointer"
                     >
                       <span className="material-symbols-outlined text-[16px]">
                         download
@@ -207,41 +206,41 @@ export function DeliverablesModal({
           {task.id === "#BNT-839" && (
             <div className="flex flex-col gap-space-md">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <div className="p-3 rounded-xl bg-surface-container border border-surface-container-high">
-                  <span className="font-label-mono-xs text-outline">
-                    CRITICAL VULNERABILITIES
+                <div className="p-3 rounded-[2px] bg-surface border border-outline">
+                  <span className="font-label-mono-xs text-on-surface-variant">
+                    Critical vulnerabilities
                   </span>
-                  <div className="font-headline-sm text-tertiary font-bold mt-1">
+                  <div className="font-headline-sm text-tertiary font-bold mt-1 tabular-nums">
                     0 Found
                   </div>
                 </div>
-                <div className="p-3 rounded-xl bg-surface-container border border-surface-container-high">
-                  <span className="font-label-mono-xs text-outline">
-                    BRANCH COVERAGE
+                <div className="p-3 rounded-[2px] bg-surface border border-outline">
+                  <span className="font-label-mono-xs text-on-surface-variant">
+                    Branch coverage
                   </span>
-                  <div className="font-headline-sm text-primary font-bold mt-1">
+                  <div className="font-headline-sm text-primary font-bold mt-1 tabular-nums">
                     100% Rust WASM
                   </div>
                 </div>
-                <div className="p-3 rounded-xl bg-surface-container border border-surface-container-high">
-                  <span className="font-label-mono-xs text-outline">
-                    INVARIANT TEST CASES
+                <div className="p-3 rounded-[2px] bg-surface border border-outline">
+                  <span className="font-label-mono-xs text-on-surface-variant">
+                    Invariant test cases
                   </span>
-                  <div className="font-headline-sm text-secondary font-bold mt-1">
+                  <div className="font-headline-sm text-secondary font-bold mt-1 tabular-nums">
                     1,420 Solved
                   </div>
                 </div>
               </div>
 
-              <div className="p-space-md rounded-xl bg-surface-container border border-surface-container-high font-mono text-[12px] flex flex-col gap-2">
+              <div className="p-space-md rounded-[2px] bg-surface border border-outline font-mono text-[12px] flex flex-col gap-2">
                 <div className="text-tertiary font-bold">
-                  ✔ Formal Verification Summary: ContractVerifier v1.0
+                  &#10004; Formal Verification Summary: ContractVerifier v1.0
                 </div>
                 <div className="text-on-surface-variant">
                   Escrow locking, unlock timeout, and arbitrator multisig rules
                   evaluated against NEAR WASM state transitions.
                 </div>
-                <div className="text-outline">
+                <div className="text-on-surface-variant">
                   Result: Safe for production deployment on NEAR mainnet.
                 </div>
               </div>
@@ -280,7 +279,7 @@ export function DeliverablesModal({
                       ),
                     )
                   }
-                  className="inline-flex items-center justify-center gap-1 px-2.5 py-1 rounded-lg bg-surface-container-high hover:bg-surface-bright active:scale-95 text-on-surface text-[12px] font-body-sm transition-all duration-150 cursor-pointer"
+                  className="inline-flex items-center justify-center gap-1 px-2.5 py-1 rounded-[2px] bg-surface hover:bg-surface-container text-on-surface text-[12px] font-body-sm transition-colors border border-outline cursor-pointer"
                 >
                   <span className="material-symbols-outlined text-[14px]">
                     {copied ? "check" : "content_copy"}
@@ -289,10 +288,10 @@ export function DeliverablesModal({
                 </button>
               </div>
 
-              <pre className="p-space-md rounded-xl bg-surface-container font-mono text-[12px] text-tertiary overflow-x-auto border border-surface-container-high">
+              <pre className="p-space-md rounded-[2px] bg-surface font-mono text-[12px] text-tertiary overflow-x-auto border border-outline tabular-nums">
                 {JSON.stringify(
                   {
-                    protocol: "AgentBounty DeFi Stream",
+                    protocol: "Quittance DeFi Stream",
                     worker: "@scout-worker",
                     status: "verified",
                     arbitrage_pairs: [
@@ -335,7 +334,7 @@ export function DeliverablesModal({
             <span className="material-symbols-outlined text-tertiary text-[16px]">
               verified
             </span>
-            <span>Cryptographic consensus verified on NEAR Testnet</span>
+            <span>Verified by rules; payment confirmed on NEAR Testnet</span>
           </div>
 
           <div className="flex items-center gap-2">

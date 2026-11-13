@@ -14,6 +14,8 @@ import { getAgentById, rewardAgentReputation } from "@/lib/agentStore";
 const SCOUT_LOCKED_PAYOUT = "0.03";
 
 export async function POST(req: NextRequest) {
+  let lockedTaskId: string | undefined;
+
   try {
     const body = await req.json().catch(() => ({}));
     const target = (body.target as "all" | "worker1" | "worker2") || "all";
@@ -23,7 +25,7 @@ export async function POST(req: NextRequest) {
     // ── Milestone 2: Server-Side Cryptographic Gate ─────────────────────────
     if (!taskId) {
       return NextResponse.json(
-        { error: "Missing taskId. Settlements must be linked to a verified AgentBounty task." },
+        { error: "Missing taskId. Settlements must be linked to a verified Quittance task." },
         { status: 400 },
       );
     }
@@ -33,7 +35,7 @@ export async function POST(req: NextRequest) {
 
     if (!task) {
       return NextResponse.json(
-        { error: `Task ${taskId} not found or has not been verified by AgentBounty.` },
+        { error: `Task ${taskId} not found or has not been verified by Quittance.` },
         { status: 404 },
       );
     }
@@ -42,7 +44,7 @@ export async function POST(req: NextRequest) {
     if (outputHash && task.outputHash && outputHash !== task.outputHash) {
       return NextResponse.json(
         {
-          error: `Cryptographic hash mismatch. Deliverable output does not match root hash ${task.outputHash.slice(0, 12)}...`,
+          error: `Hash mismatch: Deliverable output does not match root hash ${task.outputHash.slice(0, 12)}...`,
         },
         { status: 400 },
       );
@@ -98,6 +100,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Lock task status immediately to prevent rapid double-click race conditions
+    lockedTaskId = taskId;
     task.status = "settling";
     task.settlingWorkers = {
       worker1: target === "all" || target === "worker1",
@@ -106,19 +109,22 @@ export async function POST(req: NextRequest) {
     saveTask(task);
 
     // ── Milestone 4 Fix: Correct Role-to-Wallet Assignment & Clean Defaults ─
-    const managerId = process.env.MANAGER_ACCOUNT_ID || "agentbounty-manager.testnet";
+    const managerId = process.env.MANAGER_ACCOUNT_ID || "quittance-manager.testnet";
     const privateKey = process.env.MANAGER_PRIVATE_KEY;
 
     // Scout data node maps strictly to scout account
     const scoutWorkerAccount =
       process.env.WORKER_SCOUT_ACCOUNT_ID ||
       process.env.WORKER_DESIGN_ACCOUNT_ID ||
-      "scout-worker.testnet";
+      "isreel-design.testnet";
+    const scoutDisplayedHandle = scoutWorkerAccount.startsWith("@")
+      ? scoutWorkerAccount
+      : `@${scoutWorkerAccount}`;
 
     // Copywriter synthesis node maps strictly to copy account
     const copyWorkerAccount =
       process.env.WORKER_COPY_ACCOUNT_ID ||
-      "copy-agent.testnet";
+      "isreel-copy.testnet";
 
     const nodeUrl = process.env.NEAR_NODE_URL || "https://rpc.testnet.near.org";
 
@@ -136,7 +142,7 @@ export async function POST(req: NextRequest) {
     const signer = KeyPairSigner.fromSecretKey(privateKey as KeyPairString);
     const account = new Account(managerId, provider, signer);
 
-    // Validate server-side bid rate for selected copywriter from agents.json catalog
+    // Validate server-side bid rate and payout address for selected copywriter
     const catalogWorker2 = task.selectedAgent?.id
       ? await getAgentById(task.selectedAgent.id)
       : null;
@@ -148,6 +154,7 @@ export async function POST(req: NextRequest) {
     const worker2AgentHandle =
       catalogWorker2?.handle || task.selectedAgent?.handle || "@copy-agent.testnet";
     const worker2AgentId = catalogWorker2?.id || task.selectedAgent?.id || "copy-agent";
+    const worker2ReceiverId = catalogWorker2?.payoutAccount || copyWorkerAccount;
 
     const settlements: Array<{
       worker: string;
@@ -170,7 +177,7 @@ export async function POST(req: NextRequest) {
         settlements.push({
           worker: scoutWorkerAccount,
           agentName: "ScrapeScout v3.0",
-          agentHandle: "@scout-worker.testnet",
+          agentHandle: scoutDisplayedHandle,
           amount: "0 NEAR",
           txHash: "BLOCKED_BY_VERIFIER_GATE",
           explorerUrl: "",
@@ -188,7 +195,7 @@ export async function POST(req: NextRequest) {
         settlements.push({
           worker: scoutWorkerAccount,
           agentName: "ScrapeScout v3.0",
-          agentHandle: "@scout-worker.testnet",
+          agentHandle: scoutDisplayedHandle,
           amount: `${amount} NEAR`,
           txHash: result1.transaction.hash,
           explorerUrl: `https://testnet.nearblocks.io/txns/${result1.transaction.hash}`,
@@ -197,18 +204,22 @@ export async function POST(req: NextRequest) {
         });
 
         task.settledWorkers.worker1 = true;
-        await rewardAgentReputation("scrape-scout", 1);
+        try {
+          await rewardAgentReputation("scrape-scout", 1);
+        } catch (err) {
+          console.warn("Failed to reward agent reputation for scrape-scout:", err);
+        }
       }
     }
 
-    // 2. Payout Worker 2 (Copy / Synthesis) - strictly catalog bid price if passed
+    // 2. Payout Worker 2 (Copy / Synthesis) - strictly catalog bid price to their payoutAccount if passed
     if (
       (target === "all" || target === "worker2") &&
       !task.settledWorkers.worker2
     ) {
       if (task.verification?.worker2 && !task.verification.worker2.passed) {
         settlements.push({
-          worker: copyWorkerAccount,
+          worker: worker2ReceiverId,
           agentName: worker2AgentName,
           agentHandle: worker2AgentHandle,
           amount: "0 NEAR",
@@ -221,12 +232,12 @@ export async function POST(req: NextRequest) {
       } else {
         const amount = worker2Amount;
         const result2 = await account.signAndSendTransaction({
-          receiverId: copyWorkerAccount,
+          receiverId: worker2ReceiverId,
           actions: [actions.transfer(nearToYocto(worker2AmountNum))],
         });
 
         settlements.push({
-          worker: copyWorkerAccount,
+          worker: worker2ReceiverId,
           agentName: worker2AgentName,
           agentHandle: worker2AgentHandle,
           amount: `${amount} NEAR`,
@@ -237,7 +248,11 @@ export async function POST(req: NextRequest) {
         });
 
         task.settledWorkers.worker2 = true;
-        await rewardAgentReputation(worker2AgentId, 1);
+        try {
+          await rewardAgentReputation(worker2AgentId, 1);
+        } catch (err) {
+          console.warn(`Failed to reward agent reputation for ${worker2AgentId}:`, err);
+        }
       }
     }
 
@@ -288,6 +303,24 @@ export async function POST(req: NextRequest) {
     });
   } catch (error: unknown) {
     console.error("NEAR Settlement Error:", error);
+    if (lockedTaskId) {
+      try {
+        const store = getTaskStore();
+        const lockedTask = store.get(lockedTaskId);
+        if (lockedTask) {
+          const anyPaid = Boolean(
+            lockedTask.settledWorkers?.worker1 ||
+            lockedTask.settledWorkers?.worker2 ||
+            lockedTask.settlements?.some((s) => s.status === "paid" && !s.txHash.includes("BLOCKED"))
+          );
+          lockedTask.status = anyPaid ? "settled" : "verified";
+          lockedTask.settlingWorkers = { worker1: false, worker2: false };
+          saveTask(lockedTask);
+        }
+      } catch (recoveryErr) {
+        console.warn("Failed to reset locked task status on error:", recoveryErr);
+      }
+    }
     const message =
       error instanceof Error ? error.message : "Failed to settle on NEAR";
     return NextResponse.json({ error: message }, { status: 500 });

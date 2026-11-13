@@ -7,7 +7,7 @@ export async function GET(req: NextRequest) {
   const accountId =
     url.searchParams.get("accountId") ||
     process.env.MANAGER_ACCOUNT_ID ||
-    "agentbounty-treasury.testnet";
+    "quittance-treasury.testnet";
   const nodeUrl = process.env.NEAR_NODE_URL || "https://rpc.testnet.near.org";
 
   try {
@@ -31,7 +31,8 @@ export async function GET(req: NextRequest) {
     console.warn("Could not fetch live NEAR balance:", message);
     return NextResponse.json({
       accountId,
-      balance: "48.50 NEAR",
+      balance: "unavailable",
+      totalBalance: "unavailable",
       isLive: false,
     });
   }

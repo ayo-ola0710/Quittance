@@ -83,7 +83,7 @@ export interface SwarmTask {
 const DATA_FILE_PATH = path.join(process.cwd(), "data", "tasks.json");
 
 declare global {
-  var __AGENTBOUNTY_TASK_STORE__: Map<string, SwarmTask> | undefined;
+  var __QUITTANCE_TASK_STORE__: Map<string, SwarmTask> | undefined;
 }
 
 function loadPersistedTasks(): Map<string, SwarmTask> {
@@ -120,10 +120,10 @@ function persistTasks(store: Map<string, SwarmTask>): void {
 }
 
 export function getTaskStore(): Map<string, SwarmTask> {
-  if (!globalThis.__AGENTBOUNTY_TASK_STORE__) {
-    globalThis.__AGENTBOUNTY_TASK_STORE__ = loadPersistedTasks();
+  if (!globalThis.__QUITTANCE_TASK_STORE__) {
+    globalThis.__QUITTANCE_TASK_STORE__ = loadPersistedTasks();
   }
-  return globalThis.__AGENTBOUNTY_TASK_STORE__;
+  return globalThis.__QUITTANCE_TASK_STORE__;
 }
 
 export function saveTask(task: SwarmTask): void {

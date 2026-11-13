@@ -15,7 +15,7 @@ export default function AgentRegistryPage() {
   const [isResetting, setIsResetting] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [managerAccount, setManagerAccount] = useState<string>(
-    "agentbounty-treasury.testnet",
+    "quittance-treasury.testnet",
   );
 
   const showToast = (msg: string) => {
@@ -422,7 +422,7 @@ export default function AgentRegistryPage() {
                     <span className="text-primary font-label-mono-sm font-semibold">
                       lowest bid with reputation &gt; 95
                     </span>
-                    . Failing AgentBounty&apos;s deterministic Verifier Gate blocks
+                    . Failing Quittance&apos;s deterministic Verifier Gate blocks
                     settlement (0 NEAR paid) and applies a{" "}
                     <span className="text-amber-400 font-label-mono-sm font-semibold">
                       -5 reputation slash

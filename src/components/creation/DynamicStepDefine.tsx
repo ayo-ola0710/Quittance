@@ -83,61 +83,58 @@ export function DynamicStepDefine({
   };
 
   return (
-    <div className="flex flex-col gap-space-lg w-full">
+    <div className="flex flex-col gap-6 w-full">
       {/* Title & Instructions */}
-      <div className="flex flex-col gap-space-xs">
-        <div className="flex items-center gap-space-sm flex-wrap">
-          <span className="font-label-mono-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary uppercase font-semibold">
-            Step 1 of 3
+      <div className="flex flex-col gap-1 pb-3 border-b border-outline">
+        <div className="flex items-center gap-2">
+          <span className="font-label-mono-xs px-2 py-0.5 rounded-[2px] bg-surface-container border border-outline text-on-surface-variant font-medium">
+            Stage 1 of 3
           </span>
-          <span className="font-label-mono-xs text-outline">•</span>
-          <span className="font-label-mono-xs text-tertiary">
+          <span className="font-body-sm text-on-surface-variant">
             Post a task. Agents bid. Verified work gets paid.
           </span>
         </div>
-        <h1 className="font-headline-lg text-on-surface tracking-tight font-semibold">
-          What do you need done?
+        <h1 className="font-headline-lg text-on-surface tracking-tight font-semibold mt-1">
+          Define task requirements
         </h1>
         <p className="font-body-md text-on-surface-variant max-w-2xl">
-          Describe your task in plain English. Two AI agents will work on it in parallel — one researches, one writes. Only verified work gets paid.
+          Describe what you need. AI agents will inspect your task and submit bids. Only deliverables passing automated verification are settled on NEAR.
         </p>
       </div>
 
       <form
         onSubmit={handleSubmit}
-        className="grid grid-cols-1 xl:grid-cols-12 gap-space-lg items-start"
+        className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start"
       >
         {/* Left Column: Directive & Parameters */}
-        <div className="xl:col-span-8 flex flex-col gap-space-md bg-surface-container-low rounded-xl p-space-lg shadow-xl border border-surface-container-high/40">
+        <div className="xl:col-span-8 paper-slip rounded-[2px] p-6 flex flex-col gap-5 border border-outline">
           {/* Directive Input Area */}
-          <div className="flex flex-col gap-space-xs">
-            <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-1.5">
+            <div className="flex items-center justify-between font-body-sm text-xs">
               <label
                 htmlFor="directive-textarea"
-                className="font-label-mono-xs uppercase text-on-surface-variant tracking-wider font-semibold"
+                className="font-semibold text-on-surface"
               >
-                Your Task Description
+                Task directive
               </label>
-              <span className="font-label-mono-xs text-outline">
+              <span className="text-on-surface-variant tabular-nums">
                 {prompt.length} characters
               </span>
             </div>
-            <div className="relative">
-              <textarea
-                id="directive-textarea"
-                rows={4}
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
-                placeholder="E.g. Write a launch campaign for my NEAR-based payment app. Target audience: Shopify merchants. Highlight low fees and instant settlement."
-                className="w-full bg-surface-container-lowest text-on-surface p-space-md rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-primary shadow-inner border border-surface-container-high/40 resize-none"
-              />
-            </div>
+            <textarea
+              id="directive-textarea"
+              rows={4}
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              placeholder="Describe your requirements in plain language..."
+              className="w-full bg-surface-container-low text-on-surface p-3 rounded-[2px] font-body-md focus:outline-none focus:ring-1 focus:ring-primary border border-outline resize-none"
+            />
           </div>
 
           {/* Quick Presets */}
-          <div className="flex flex-col gap-space-xs pt-1">
-            <span className="font-label-mono-xs text-outline uppercase tracking-wider">
-              Example Tasks (click to load)
+          <div className="flex flex-col gap-1.5 pt-1">
+            <span className="font-body-sm text-xs text-on-surface-variant">
+              Example directives (click to load):
             </span>
             <div className="flex flex-wrap gap-2">
               {presets.map((p, idx) => (
@@ -145,7 +142,7 @@ export function DynamicStepDefine({
                   key={idx}
                   type="button"
                   onClick={() => handlePresetClick(p)}
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full font-label-mono-xs bg-surface-container-low text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-all duration-150 cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[2px] font-body-sm text-xs bg-surface-container-low text-on-surface-variant hover:text-on-surface hover:bg-surface-container border border-outline/70 transition-colors cursor-pointer"
                 >
                   <span className="material-symbols-outlined text-[13px] text-primary">
                     auto_awesome
@@ -157,9 +154,9 @@ export function DynamicStepDefine({
           </div>
 
           {/* Category Selector */}
-          <div className="flex flex-col gap-space-xs pt-2">
-            <label className="font-label-mono-xs text-on-surface-variant uppercase tracking-wider font-semibold">
-              Task Type
+          <div className="flex flex-col gap-1.5 pt-2">
+            <label className="font-body-sm text-xs font-semibold text-on-surface">
+              Task category
             </label>
             <div className="flex flex-wrap gap-2">
               {categories.map((cat) => {
@@ -169,10 +166,10 @@ export function DynamicStepDefine({
                     key={cat}
                     type="button"
                     onClick={() => setCategory(cat)}
-                    className={`px-3 py-1.5 rounded-lg text-body-sm font-medium transition-all ${
+                    className={`px-3 py-1 rounded-[2px] font-body-sm text-xs transition-colors border cursor-pointer ${
                       isSelected
-                        ? "bg-primary text-on-primary font-semibold shadow-sm"
-                        : "bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high"
+                        ? "bg-primary text-on-primary border-primary font-semibold"
+                        : "bg-surface text-on-surface-variant hover:text-on-surface hover:bg-surface-container border-outline"
                     }`}
                   >
                     {cat}
@@ -183,13 +180,13 @@ export function DynamicStepDefine({
           </div>
 
           {/* Budget & Delivery Time */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-space-md pt-space-xs border-t border-surface-container-high/30 mt-space-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-3 border-t border-outline/40">
             <div className="flex flex-col gap-1">
               <label
                 htmlFor="budget-input"
-                className="font-label-mono-xs uppercase text-on-surface-variant tracking-wider font-semibold"
+                className="font-body-sm text-xs font-semibold text-on-surface"
               >
-                Max Task Budget (NEAR)
+                Max task budget (NEAR)
               </label>
               <div className="relative">
                 <input
@@ -199,102 +196,101 @@ export function DynamicStepDefine({
                   min="0.01"
                   value={budget}
                   onChange={(e) => setBudget(e.target.value)}
-                  className="w-full bg-surface-container-lowest text-on-surface px-space-md py-2.5 rounded-lg font-mono font-semibold focus:outline-none focus:ring-1 focus:ring-primary border border-surface-container-high/40"
+                  className="w-full bg-surface-container-low text-on-surface px-3 py-2 rounded-[2px] font-mono font-semibold focus:outline-none focus:ring-1 focus:ring-primary border border-outline tabular-nums"
                 />
-                <span className="absolute right-3 top-2.5 font-label-mono-sm text-primary font-semibold">
+                <span className="absolute right-3 top-2 font-label-mono-sm text-secondary font-semibold">
                   NEAR
                 </span>
               </div>
-              <span className="font-label-mono-xs text-outline">
-                Standard 2-agent rate: 0.03 Research + 0.05 Writing
+              <span className="font-body-sm text-[11px] text-on-surface-variant">
+                Quoted rates: 0.03 Research + 0.05 Writing
               </span>
             </div>
 
             <div className="flex flex-col gap-1">
-              <label className="font-label-mono-xs uppercase text-on-surface-variant tracking-wider font-semibold">
-                Estimated Delivery
-              </label>
-              <div className="p-2.5 rounded-lg bg-surface-container-lowest flex items-center justify-between border border-surface-container-high/40">
-                <span className="font-label-mono-sm text-tertiary font-semibold flex items-center gap-1">
-                  <span className="material-symbols-outlined text-[16px]">
-                    bolt
+              <span className="font-body-sm text-xs font-semibold text-on-surface">
+                Estimated inspection time
+              </span>
+              <div className="p-2 rounded-[2px] bg-surface-container-low flex items-center justify-between border border-outline">
+                <span className="font-body-sm text-xs text-tertiary font-semibold flex items-center gap-1">
+                  <span className="material-symbols-outlined text-[15px]">
+                    speed
                   </span>
-                  ~2–5 seconds (Live AI)
+                  2&ndash;5 seconds
                 </span>
-                <span className="font-label-mono-xs text-outline">
-                  Auto-verified
+                <span className="font-label-mono-xs text-on-surface-variant">
+                  Deterministic
                 </span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Right Column: How It Works Box & CTA */}
-        <div className="xl:col-span-4 flex flex-col gap-space-md">
-          <div className="bg-surface-container-low rounded-xl p-space-lg shadow-xl flex flex-col gap-space-md border border-surface-container-high/40">
-            <div className="flex items-center justify-between pb-space-sm border-b border-surface-container-high/30">
-              <span className="font-label-mono-xs text-on-surface-variant uppercase tracking-wider font-semibold">
-                How It Works
+        {/* Right Column: Procurement Protocol Summary & CTA */}
+        <div className="xl:col-span-4 flex flex-col gap-4">
+          <div className="paper-slip rounded-[2px] p-5 flex flex-col gap-4 border border-outline">
+            <div className="flex items-center justify-between pb-2 border-b border-outline/50">
+              <span className="font-label-mono-xs uppercase text-on-surface-variant font-medium">
+                Procurement protocol
               </span>
-              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full font-label-mono-xs font-medium tracking-wide bg-tertiary/10 text-tertiary">
-                <span className="w-1.5 h-1.5 rounded-full bg-tertiary" />
-                Ready
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[2px] font-label-mono-xs bg-tertiary-container text-on-tertiary-container border border-tertiary/30">
+                Active
               </span>
             </div>
 
-            <div className="space-y-space-sm">
-              <div className="p-space-sm rounded-lg bg-surface-container-lowest flex items-center gap-space-sm border border-surface-container-high/30">
-                <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                  <span className="material-symbols-outlined text-[18px]">
+            <div className="space-y-2.5 font-body-sm">
+              <div className="p-2.5 rounded-[2px] bg-surface-container-low flex items-center gap-3 border border-outline/50">
+                <div className="w-7 h-7 rounded-[2px] bg-surface border border-outline flex items-center justify-center shrink-0">
+                  <span className="material-symbols-outlined text-[16px] text-primary">
                     splitscreen
                   </span>
                 </div>
                 <div className="flex flex-col min-w-0">
-                  <span className="font-body-md text-on-surface font-medium truncate">
-                    1. Split Into 2 Jobs
+                  <span className="font-medium text-on-surface truncate">
+                    1. Parallel agents
                   </span>
-                  <span className="font-label-mono-xs text-on-surface-variant truncate">
-                    One agent researches, one agent writes
+                  <span className="text-xs text-on-surface-variant truncate">
+                    Research node &amp; synthesis node
                   </span>
                 </div>
               </div>
 
-              <div className="p-space-sm rounded-lg bg-surface-container-lowest flex items-center gap-space-sm border border-surface-container-high/30">
-                <div className="w-8 h-8 rounded-lg bg-secondary/10 text-secondary flex items-center justify-center shrink-0">
-                  <span className="material-symbols-outlined text-[18px]">
+              <div className="p-2.5 rounded-[2px] bg-surface-container-low flex items-center gap-3 border border-outline/50">
+                <div className="w-7 h-7 rounded-[2px] bg-surface border border-outline flex items-center justify-center shrink-0">
+                  <span className="material-symbols-outlined text-[16px] text-secondary">
                     gavel
                   </span>
                 </div>
                 <div className="flex flex-col min-w-0">
-                  <span className="font-body-md text-on-surface font-medium truncate">
-                    2. Agents Compete
+                  <span className="font-medium text-on-surface truncate">
+                    2. Price ladder
                   </span>
-                  <span className="font-label-mono-xs text-on-surface-variant truncate">
-                    Cheapest agent with rep &gt; 95 wins
+                  <span className="text-xs text-on-surface-variant truncate">
+                    Lowest bid with reputation &gt; 95%
                   </span>
                 </div>
               </div>
 
-              <div className="p-space-sm rounded-lg bg-surface-container-lowest flex items-center gap-space-sm border border-surface-container-high/30">
-                <div className="w-8 h-8 rounded-lg bg-tertiary/10 text-tertiary flex items-center justify-center shrink-0">
-                  <span className="material-symbols-outlined text-[18px]">
-                    verified_user
+              <div className="p-2.5 rounded-[2px] bg-surface-container-low flex items-center gap-3 border border-outline/50">
+                <div className="w-7 h-7 rounded-[2px] bg-surface border border-outline flex items-center justify-center shrink-0">
+                  <span className="material-symbols-outlined text-[16px] text-tertiary">
+                    verified
                   </span>
                 </div>
                 <div className="flex flex-col min-w-0">
-                  <span className="font-body-md text-on-surface font-medium truncate">
-                    3. Pay Only Verified Work
+                  <span className="font-medium text-on-surface truncate">
+                    3. Customs inspection
                   </span>
-                  <span className="font-label-mono-xs text-on-surface-variant truncate">
-                    Bad outputs get blocked automatically
+                  <span className="text-xs text-on-surface-variant truncate">
+                    4 deterministic rules before payout
                   </span>
                 </div>
               </div>
             </div>
 
-            <div className="pt-space-sm border-t border-surface-container-high/30 flex flex-col gap-space-sm">
-              <div className="flex items-center justify-between text-on-surface-variant font-label-mono-xs">
-                <span>Manager Balance:</span>
+            <div className="pt-2 border-t border-outline/40 flex flex-col gap-3 font-body-sm">
+              <div className="flex items-center justify-between text-xs text-on-surface-variant tabular-nums">
+                <span>Signer balance:</span>
                 <span className="text-on-surface font-semibold">
                   {walletBalance}
                 </span>
@@ -302,10 +298,10 @@ export function DynamicStepDefine({
 
               <button
                 type="submit"
-                className="w-full flex items-center justify-center gap-space-sm py-3 px-space-md rounded-xl bg-linear-to-r from-primary-container to-primary text-on-primary-container font-headline-sm font-semibold shadow-[0_0_24px_rgba(6,182,212,0.4)] hover:shadow-[0_0_32px_rgba(6,182,212,0.65)] active:scale-95 transition-all cursor-pointer"
+                className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-[2px] bg-primary hover:bg-primary/90 text-on-primary font-semibold transition-colors cursor-pointer"
               >
-                <span>Find Agents &amp; Get Bids</span>
-                <span className="material-symbols-outlined text-[20px]">
+                <span>Inspect bids &amp; assign agents</span>
+                <span className="material-symbols-outlined text-[18px]">
                   arrow_forward
                 </span>
               </button>

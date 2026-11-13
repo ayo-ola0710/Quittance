@@ -13,7 +13,7 @@ interface NavbarProps {
 export function Navbar({
   activePath = "mission-control",
   accountBalance = "...",
-  accountId = "agentbounty-treasury.testnet",
+  accountId = "quittance-treasury.testnet",
   rpcStatus = "RPC Online",
 }: NavbarProps) {
   const [isConnected, setIsConnected] = useState(true);
@@ -49,7 +49,7 @@ export function Navbar({
 
   const navItems = [
     { label: "Dashboard", path: "mission-control", href: "/" },
-    { label: "New Task", path: "create-task", href: "/create-task" },
+    { label: "New task", path: "create-task", href: "/create-task" },
     {
       label: "Ledger",
       path: "settlement-ledger",
@@ -63,32 +63,31 @@ export function Navbar({
   ];
 
   return (
-    <header className="fixed top-0 w-full z-50 bg-surface-container-lowest/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.5)]">
+    <header className="fixed top-0 w-full z-50 bg-surface/95 backdrop-blur-md border-b border-outline">
       <div className="h-16 w-full px-gutter-desktop flex items-center justify-between gap-space-md">
         {/* Brand / Logo */}
         <div className="flex items-center gap-space-md">
-          {/* Logo image with fallback styling */}
-          <Link href="/" className="flex items-center gap-space-xs group">
+          <Link href="/" className="flex items-center gap-2 group">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              alt="AgentBounty Logo"
+              alt="Quittance Logo"
               className="h-8 w-auto object-contain transition-transform group-hover:scale-105"
               src="/logo.png"
             />
-            <span className="font-headline-sm tracking-tight text-on-surface font-semibold ml-2">
-              AgentBounty
+            <span className="font-headline-sm tracking-tight text-on-surface font-semibold">
+              Quittance
             </span>
           </Link>
-          <div className="flex items-center gap-space-xs px-space-sm py-0.5 rounded-full bg-surface-container-high">
-            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-            <span className="font-label-mono-xs text-on-surface-variant uppercase tracking-wider">
+          <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-[2px] border border-outline/60 bg-surface-container-low">
+            <span className="w-1.5 h-1.5 rounded-full bg-tertiary" />
+            <span className="font-label-mono-xs text-on-surface-variant">
               NEAR Testnet
             </span>
           </div>
         </div>
 
         {/* Navigation Tabs */}
-        <nav className="hidden md:flex items-center gap-space-xs p-1 rounded-full bg-surface-container-low">
+        <nav className="hidden md:flex items-center gap-1 p-1 rounded-[2px] border border-outline/50 bg-surface-container-low">
           {navItems.map((item) => {
             const isActive = activePath === item.path;
             return (
@@ -97,8 +96,8 @@ export function Navbar({
                 href={item.href}
                 className={
                   isActive
-                    ? "px-space-md py-1.5 rounded-full font-body-sm bg-primary-container text-on-primary-container font-medium shadow-[0_0_16px_rgba(6,182,212,0.3)] transition-colors"
-                    : "px-space-md py-1.5 rounded-full font-body-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors"
+                    ? "px-3 py-1.5 rounded-[2px] font-body-sm bg-primary text-on-primary font-medium transition-colors"
+                    : "px-3 py-1.5 rounded-[2px] font-body-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors"
                 }
               >
                 {item.label}
@@ -110,8 +109,8 @@ export function Navbar({
         {/* Right Info Cluster */}
         <div className="flex items-center gap-space-md">
           {/* RPC Status */}
-          <div className="hidden xl:flex items-center gap-space-xs px-space-sm py-1 rounded-full bg-surface-container-low">
-            <span className="w-1.5 h-1.5 rounded-full bg-tertiary shadow-[0_0_8px_rgba(78,222,163,0.5)]" />
+          <div className="hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-[2px] border border-outline/50 bg-surface">
+            <span className="w-1.5 h-1.5 rounded-full bg-tertiary" />
             <span className="font-label-mono-xs text-on-surface-variant">
               {rpcStatus}
             </span>
@@ -123,18 +122,18 @@ export function Navbar({
               <button
                 type="button"
                 onClick={() => setShowWalletMenu(!showWalletMenu)}
-                className="flex items-center gap-space-sm px-space-md py-1.5 rounded-full bg-surface-container-low hover:bg-surface-container-high transition-colors cursor-pointer border border-surface-container-high/40"
+                className="flex items-center gap-space-sm px-3 py-1.5 rounded-[2px] bg-surface hover:bg-surface-container transition-colors cursor-pointer border border-outline"
               >
-                <div className="flex items-center gap-space-xs">
-                  <span className="material-symbols-outlined text-[16px] text-primary">
+                <div className="flex items-center gap-1.5">
+                  <span className="material-symbols-outlined text-[16px] text-secondary">
                     account_balance_wallet
                   </span>
-                  <span className="font-label-mono-sm text-primary font-semibold">
+                  <span className="font-label-mono-sm text-secondary font-semibold tabular-nums">
                     {isLoadingBalance ? "..." : balance}
                   </span>
                 </div>
-                <span className="w-px h-3 bg-surface-container-highest" />
-                <span className="font-label-mono-sm text-on-surface">
+                <span className="w-px h-3 bg-outline" />
+                <span className="font-label-mono-sm text-on-surface tabular-nums">
                   {currentAccountId}
                 </span>
                 <span className="material-symbols-outlined text-[16px] text-on-surface-variant">
@@ -144,15 +143,15 @@ export function Navbar({
 
               {/* Wallet Dropdown */}
               {showWalletMenu && (
-                <div className="absolute right-0 mt-2 w-64 rounded-xl bg-surface-container-high border border-surface-container-highest shadow-2xl p-2 z-50 flex flex-col gap-1 font-body-sm animate-in fade-in zoom-in-95 duration-150">
-                  <div className="px-3 py-2 border-b border-surface-container-highest/60 flex flex-col gap-0.5">
-                    <span className="font-label-mono-xs text-outline uppercase tracking-wider block">
-                      Connected Account
+                <div className="absolute right-0 mt-2 w-64 rounded-[2px] bg-surface border border-outline shadow-lg p-2 z-50 flex flex-col gap-1 font-body-sm animate-in fade-in zoom-in-95 duration-150">
+                  <div className="px-3 py-2 border-b border-outline/50 flex flex-col gap-0.5">
+                    <span className="font-label-mono-xs text-on-surface-variant block">
+                      Connected account
                     </span>
-                    <span className="font-label-mono-sm text-on-surface font-semibold truncate block">
+                    <span className="font-label-mono-sm text-on-surface font-semibold truncate block tabular-nums">
                       {currentAccountId}
                     </span>
-                    <span className="font-label-mono-xs text-primary font-medium mt-1">
+                    <span className="font-label-mono-xs text-secondary font-medium mt-1 tabular-nums">
                       Available: {balance}
                     </span>
                   </div>
@@ -160,7 +159,7 @@ export function Navbar({
                     href={`https://testnet.nearblocks.io/address/${currentAccountId}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="flex items-center gap-2 px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors"
+                    className="flex items-center gap-2 px-3 py-2 rounded-[2px] text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors"
                   >
                     <span className="material-symbols-outlined text-[16px]">
                       open_in_new
@@ -173,12 +172,12 @@ export function Navbar({
                       setIsConnected(false);
                       setShowWalletMenu(false);
                     }}
-                    className="flex items-center gap-2 px-3 py-2 rounded-lg text-error hover:bg-error-container/20 transition-colors w-full text-left cursor-pointer"
+                    className="flex items-center gap-2 px-3 py-2 rounded-[2px] text-error hover:bg-error-container/40 transition-colors w-full text-left cursor-pointer"
                   >
                     <span className="material-symbols-outlined text-[16px]">
                       logout
                     </span>
-                    <span>Disconnect Wallet</span>
+                    <span>Disconnect wallet</span>
                   </button>
                 </div>
               )}
@@ -187,7 +186,7 @@ export function Navbar({
             <button
               type="button"
               onClick={() => setIsConnected(true)}
-              className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-primary hover:bg-primary-container text-on-primary font-body-sm font-semibold shadow-[0_0_16px_rgba(6,182,212,0.4)] transition-all cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-[2px] bg-primary hover:bg-primary/90 text-on-primary font-body-sm font-semibold transition-all cursor-pointer"
             >
               <span className="material-symbols-outlined text-[16px]">
                 account_balance_wallet
@@ -197,7 +196,7 @@ export function Navbar({
           )}
 
           {/* User Avatar */}
-          <div className="w-8 h-8 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center">
+          <div className="w-8 h-8 rounded-[2px] bg-surface-container border border-outline flex items-center justify-center">
             <span className="material-symbols-outlined text-primary text-[18px]">
               person
             </span>

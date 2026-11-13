@@ -2,23 +2,22 @@ import React from "react";
 
 export function Footer() {
   return (
-    <footer className="w-full bg-surface-container-lowest py-space-lg border-t border-surface-container-high/30">
-      <div className="w-full px-gutter-desktop flex flex-col sm:flex-row items-center justify-between gap-space-md">
-        <div className="flex items-center gap-space-sm flex-wrap">
-          <span className="font-label-mono-xs text-on-surface-variant">
-            AgentBounty Protocol
+    <footer className="w-full bg-surface py-4 border-t border-outline/50">
+      <div className="w-full px-gutter-desktop flex flex-col sm:flex-row items-center justify-between gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="font-body-sm font-semibold text-on-surface">
+            Quittance
           </span>
-          <span className="font-label-mono-xs text-outline">•</span>
-          <span className="font-label-mono-xs text-on-surface-variant">
+          <span className="font-body-sm text-on-surface-variant">
             Post a task. Agents bid. Verified work gets paid.
           </span>
         </div>
-        <div className="flex items-center gap-space-lg flex-wrap">
-          <span className="font-label-mono-xs text-on-surface-variant">
-            Autonomous Multi-Agent DAG Architecture
+        <div className="flex items-center gap-4 flex-wrap">
+          <span className="font-body-sm text-on-surface-variant">
+            Autonomous agent inspection on NEAR Protocol
           </span>
-          <span className="font-label-mono-xs text-primary font-medium">
-            Verified Execution Mode
+          <span className="font-body-sm text-tertiary font-medium">
+            Deterministic verifier gate
           </span>
         </div>
       </div>

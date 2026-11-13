@@ -15,13 +15,13 @@ export async function GET(req: NextRequest) {
   // Milestone 1 Fix: Strict 404 on non-existent tasks. Absolutely no fake spoofed receipts!
   if (!task) {
     return NextResponse.json(
-      { error: `Receipt not found for task #${taskId}. Only verified on-chain tasks generate immutable receipts.` },
+      { error: `Receipt not found for task #${taskId}.` },
       { status: 404 },
     );
   }
 
   const managerAccount =
-    process.env.MANAGER_ACCOUNT_ID || "agentbounty-manager.testnet";
+    process.env.MANAGER_ACCOUNT_ID || "quittance-manager.testnet";
 
   return NextResponse.json({
     taskId: task.taskId,

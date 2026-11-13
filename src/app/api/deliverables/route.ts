@@ -158,7 +158,7 @@ function getFallbackDeliverables(
     topicClusters: [
       { tag: "#AiAgents", count: 412 },
       { tag: "#NEARProtocol", count: 294 },
-      { tag: "#AgentBounty", count: 188 },
+      { tag: "#Quittance", count: 188 },
     ],
     summary:
       "Sentiment scoring across decentralized agent deployments confirms accelerated adoption of autonomous DAG bounty architectures on NEAR Protocol.",
@@ -185,9 +185,9 @@ function getFallbackDeliverables(
         runtime: "1.16s",
         sha256: "0xfa7723ce51a84f3e981bb204cc1948",
         filename: "alpha_thread_output.md",
-        copyHeadline: "⚡ NEAR AUTONOMOUS AGENT BOUNTY INTEL",
+        copyHeadline: "⚡ NEAR QUITTANCE SETTLEMENT INTEL",
         copyBody:
-          "Live stream analysis indicates a major developer pivot toward dynamic on-chain swarm routing. Sentiment remains at +78% positive following NEAR Testnet launch. AgentBounty treasury settlement models show instantaneous sub-second verifications.",
+          "Live stream analysis indicates a major developer pivot toward dynamic on-chain swarm routing. Sentiment remains at +78% positive following NEAR Testnet launch. Quittance treasury settlement models show instantaneous sub-second verifications.",
         wordCount: 142,
         readingTime: "45s",
         designPrompt:
@@ -212,7 +212,7 @@ function getFallbackDeliverables(
     outputHash,
     rulesHash,
     isLive: false,
-    taskTitle: simulateBadWorker ? "Simulated Malicious Worker Task" : "Autonomous Swarm Bounty Directive",
+    taskTitle: simulateBadWorker ? "Simulated Malicious Worker Task" : "Quittance Task Directive",
     simulateBadWorker,
     verification,
     executionEvents: fallbackEvents,
@@ -232,19 +232,23 @@ async function finalizeAndPersistDeliverable(params: {
   let agentSnapshot: SelectedAgentSnapshot = { ...params.selectedAgent };
 
   if (!responsePayload.verification.worker2.passed) {
-    const slashed = await slashAgentReputation(agentSnapshot.id, 5);
-    if (slashed) {
-      agentSnapshot = {
-        ...agentSnapshot,
-        reputationAfter: slashed.reputation,
-        slashed: true,
-      };
-      responsePayload.executionEvents.push({
-        timestamp: new Date().toISOString().substring(11, 23),
-        agent: "ReputationEngine",
-        level: "warn",
-        message: `Reputation slashed for ${agentSnapshot.handle}: ${agentSnapshot.reputationAtSelection ?? "—"} → ${slashed.reputation} (-5 penalty).`,
-      });
+    try {
+      const slashed = await slashAgentReputation(agentSnapshot.id, 5);
+      if (slashed) {
+        agentSnapshot = {
+          ...agentSnapshot,
+          reputationAfter: slashed.reputation,
+          slashed: true,
+        };
+        responsePayload.executionEvents.push({
+          timestamp: new Date().toISOString().substring(11, 23),
+          agent: "ReputationEngine",
+          level: "warn",
+          message: `Reputation slashed for ${agentSnapshot.handle}: ${agentSnapshot.reputationAtSelection ?? "—"} → ${slashed.reputation} (-5 penalty).`,
+        });
+      }
+    } catch (err) {
+      console.warn("Failed to slash agent reputation:", err);
     }
   }
 
@@ -364,7 +368,7 @@ export async function POST(req: NextRequest) {
         message: "Initiated telemetry extraction via Gemini Flash...",
       });
 
-      const worker1SystemPrompt = `You are @scout-worker.testnet, an autonomous data extraction and telemetry research agent in the AgentBounty network on NEAR.
+      const worker1SystemPrompt = `You are @scout-worker.testnet, an autonomous data extraction and telemetry research agent in the Quittance network on NEAR.
 Analyze this user bounty directive:
 "${effectivePrompt}"
 
@@ -417,7 +421,7 @@ Respond ONLY with valid JSON.`;
         topicClusters: parsed.topicClusters || [
           { tag: "#NearSwarm", count: 320 },
           { tag: "#AutonomousAI", count: 210 },
-          { tag: "#AgentBounty", count: 145 },
+          { tag: "#Quittance", count: 145 },
         ],
         summary: parsed.summary || "Data feed verified and signed.",
       };
@@ -460,17 +464,17 @@ Respond ONLY with valid JSON.`;
         message: "Initiated synthesis, copywriting, and 4K prompt generation via Gemini Flash...",
       });
 
-      const worker2SystemPrompt = `You are ${resolvedAgent.handle}, an autonomous synthesis and creative agent (${resolvedAgent.specialty}) in the AgentBounty network on NEAR.
+      const worker2SystemPrompt = `You are ${resolvedAgent.handle}, an autonomous synthesis and creative agent (${resolvedAgent.specialty}) in the Quittance network on NEAR.
 Given this user directive:
 "${effectivePrompt}"
 
 Generate marketing/synthesis copy and an image generation prompt directly based on this directive.
 Return valid JSON matching this schema:
 {
-  "taskTitle": "Punchy bounty headline (max 7 words)",
+  "taskTitle": "Punchy task headline (max 7 words)",
   "deliverableTitle": "Title of deliverable (e.g. 'Launch Campaign & 4K Hero Banner Specs')",
   "filename": "Filename string (e.g. 'launch_announcement.md')",
-  "copyHeadline": "Punchy headline with emoji (e.g. '⚡ AGENTBOUNTY INTEL')",
+  "copyHeadline": "Punchy headline with emoji (e.g. '⚡ QUITTANCE INTEL')",
   "copyBody": "High-quality, polished 2-3 paragraph markdown copy or announcement fulfilling this directive with specific domain references.",
   "wordCount": 160,
   "readingTime": "45s",
@@ -493,12 +497,12 @@ Respond ONLY with valid JSON.`;
       });
 
       return {
-        taskTitle: parsed.taskTitle || "Autonomous Swarm Bounty",
+        taskTitle: parsed.taskTitle || "Quittance Task",
         deliverableTitle: parsed.deliverableTitle || "Executive Synthesis & Brand Specs",
         runtime: `${elapsed}s`,
         sha256,
         filename: parsed.filename || "swarm_output.md",
-        copyHeadline: parsed.copyHeadline || "⚡ AGENTBOUNTY DELIVERABLE",
+        copyHeadline: parsed.copyHeadline || "⚡ QUITTANCE DELIVERABLE",
         copyBody: parsed.copyBody || "Synthesized deliverable generated by autonomous agent.",
         wordCount: parsed.wordCount || 140,
         readingTime: parsed.readingTime || "40s",
