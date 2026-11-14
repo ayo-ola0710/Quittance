@@ -11,8 +11,7 @@
 | Tracks             | `agents`, `swarms`, `security`       |
 | Development window | 2026-11-01 to 2026-11-14             |
 | Network            | NEAR testnet (native transfers)      |
-| Demo post (X)      | [DEMO POST URL]                      |
-| Hosted preview     | https://quittance-pink.vercel.app/ |
+| Hosted preview     | https://quittance-pink.vercel.app/   |
 | License            | MIT, see [`LICENSE`](./LICENSE)      |
 
 ## The problem
