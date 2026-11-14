@@ -1,6 +1,6 @@
 # Quittance
 
-> Post a task. Agents are listed at a price, and the cheapest qualified writer is picked. A rule-based verifier checks their work. Verified work is paid in NEAR, with a transaction link on the receipt. Failed work is paid 0 NEAR, and the agent loses reputation.
+> Post a task. Agents are listed at a price, and the cheapest qualified writer is picked. A rule-based verifier checks their work. We pay for verified work in NEAR, with a transaction link on the receipt. Failed work is paid 0 NEAR, and the agent loses reputation.
 
 ## Submission details
 
@@ -12,7 +12,7 @@
 | Development window | 2026-11-01 to 2026-11-14             |
 | Network            | NEAR testnet (native transfers)      |
 | Demo post (X)      | [DEMO POST URL]                      |
-| Hosted preview     | [https://quittance-pink.vercel.app/] |
+| Hosted preview     | https://quittance-pink.vercel.app/ |
 | License            | MIT, see [`LICENSE`](./LICENSE)      |
 
 ## The problem
@@ -22,7 +22,7 @@ When an agent is paid just because its script finished, empty, truncated, or off
 ## What it does
 
 1. **Define a task** (`/create-task`). The user writes a directive and a budget.
-2. **Price ladder.** Four copywriter agents are listed at fixed prices (`src/data/agents.json`). The copywriter slot goes to the lowest-priced agent whose reputation is above 95. If none clears that bar, the highest-reputation copywriter is used. A scout agent is fixed at 0.03 NEAR. The four verification rules are listed before any work runs.
+2. **Price ladder.** Four copywriter agents are listed at fixed prices (`src/data/agents.json`). The copywriter slot goes to the lowest-priced agent with a reputation above 95. If none clears that bar, the highest-reputation copywriter is used. A scout agent is fixed at 0.03 NEAR. The four verification rules are listed before any work runs.
 3. **Agents run** (`POST /api/deliverables`). The scout and the selected writer run in parallel through Gemini (or a deterministic fallback when no key is set). Each output is checked against the four rules and hashed with SHA-256. A hash of the rule set (`rulesHash`) is stored with the task.
 4. **Verifier-gated payment** (`POST /api/settle`). The server refuses to pay a worker whose output did not pass (HTTP 422) and refuses to pay the same worker twice (HTTP 409). For a passing worker, it signs a native NEAR `transfer` with `near-api-js`. If the transfer fails, the task is unlocked so it can be retried.
 5. **Reputation.** A passing, paid worker gains 1 reputation point. A failed one is paid 0 NEAR and loses 5 points. Scores are stored in `data/agent-stats.json`. A writer that drops to 95 or below is no longer eligible, so the next task goes to the next qualified writer.
@@ -43,9 +43,9 @@ Define task
    -> POST /api/deliverables   scout + writer run, 4 rules checked, SHA-256 hashes, rulesHash stored
         -> pass: eligible for payment
         -> fail: 0 NEAR, writer reputation -5
-   -> POST /api/settle         422 if not verified, 409 if already paid,
+   -> POST /api/settle         422 if not verified, 409 if already paid
                                otherwise, near-api-js transfer on testnet
-   -> /receipt/[taskId]        stored receipt with hashes, check results, and NearBlocks links
+   -> /receipt/[taskId]        stores the receipt with hashes, check results, and NearBlocks links
 ```
 
 ## Try it: do X, see Y
